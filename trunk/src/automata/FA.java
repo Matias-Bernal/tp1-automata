@@ -1,9 +1,21 @@
 package automata;
 
 import java.util.Set;
+import utils.Triple;
 
 public abstract class FA {
 
+    
+        Set<State> estados;
+        
+       	Set<Character> alfabeto;
+        
+	Set<Triple<State,Character,State>> transiciones;
+        
+	State inicial;
+        
+	Set<State> final_estados;
+                                
 	public static final Character Lambda = '_';
 	
 	/* Creation */
