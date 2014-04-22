@@ -1,5 +1,6 @@
 package automata;
 
+import java.util.List;
 import java.util.Set;
 
 import utils.Triple;
@@ -13,15 +14,18 @@ public class DFA extends FA {
 	*/
 	
 	// Constructor
-	public DFA(
-			Set<State> states,
+	public DFA(	Set<State> states,
 			Set<Character> alphabet,
 			Set<Triple<State,Character,State>> transitions,
 			State initial, 
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{	
-		// TODO
+            this.estados = states;
+            this.alfabeto = alphabet;
+            this.transiciones = transitions;
+            this.inicial = initial;
+            this.final_estados = final_states;
 	}
 	
 	/*
@@ -31,26 +35,26 @@ public class DFA extends FA {
 	
 	@Override
 	public Set<State> states() {
-		// TODO
-		return null;
+                //TODO
+		return this.estados;
 	}
 
 	@Override
 	public Set<Character> alphabet() {
-		// TODO
-		return null;
+                //TODO
+		return this.alfabeto;
 	}
 	
 	@Override
 	public State initial_state() {
-		// TODO
-		return null;
+                //TODO
+		return this.inicial;
 	}
 
 	@Override
 	public Set<State> final_states() {
 		// TODO
-		return null;
+		return this.final_estados;
 	}
 	
 	@Override
