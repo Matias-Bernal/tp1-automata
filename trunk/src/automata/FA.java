@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -68,7 +69,8 @@ public abstract class FA {
 				if (mat.matches()) {
 					//Guardar el estado Inicial
 					initial = new State(line.substring(line.indexOf('q'), line.indexOf(';'))); //cambiar q por [a-zñA-ZÑ]+\\d+
-					states.add(initial);
+					if(!states.contains(initial))
+						states.add(initial);
 					//Guardar los estados y las transiciones
 					line = br.readLine();
 					if(line!=null){
@@ -104,17 +106,16 @@ public abstract class FA {
 								Triple<State,Character,State> transition = new Triple<State, Character, State>(from, label, to);
 								if(!transitions.contains(transition))
 									transitions.add(transition);
-								
-								//FALTA VER SI ES DFA O NFA
-								
-								
 							}
 							line = br.readLine();
 							mat = pat.matcher(line);
 							mat2 = pat2.matcher(line);
 						}
+						
 						//Guarda el primer de el/los estado/s final/es
 						final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
+						if(!states.contains(final_state))
+							states.add(final_state);
 						final_states.add(final_state);
 						
 						line=br.readLine();
@@ -123,6 +124,8 @@ public abstract class FA {
 							mat = pat.matcher(line);
 							if(mat.matches()){ //Es estado final
 								final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
+								if(!states.contains(final_state))
+									states.add(final_state);
 								final_states.add(final_state);
 								line=br.readLine();
 							}else{
@@ -138,6 +141,37 @@ public abstract class FA {
 								if(nfaLambda){
 									automata = new NFALambda(final_states, alphabet, transitions, initial, final_states);
 								}else{
+									assert !(states.isEmpty());
+									assert !(transitions.isEmpty());
+									assert !(alphabet.isEmpty());
+					                Iterator<Triple<State,Character,State>> iteratorTrans = transitions.iterator();
+					                Iterator<State> iteratorStates = states.iterator();
+					                Iterator<Character> iteratorAlpaha = alphabet.iterator();
+					                while (iteratorStates.hasNext()){
+					                	State cState = iteratorStates.next();
+					                	while (iteratorAlpaha.hasNext()){
+					                		Character cCharacter = iteratorAlpaha.next();
+					                		Vector<State> destinos = new Vector<State>();
+					                		while (iteratorTrans.hasNext()){
+					                			Triple<State,Character,State> cTrans = iteratorTrans.next();
+					                			if (cTrans.first().equals(cState) && cTrans.second().equals(cCharacter)){
+					                				if(!destinos.contains(cTrans.third()))
+						                        		destinos.add(cTrans.third());
+					                			}
+					                			if(destinos.size()>0){
+							                        nfa |= true;
+							                        dfa = false;
+							                        break;
+							                    }else{
+							                        dfa &= true;
+							                    }
+					                		}
+					                		if(nfa)
+					                			break;
+					                	}
+					                	if(nfa)
+				                			break;
+					                }
 									if(dfa){
 										automata = new DFA(states, alphabet, transitions, initial, final_states);
 									}else{
