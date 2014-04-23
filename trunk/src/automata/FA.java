@@ -14,7 +14,7 @@ public abstract class FA {
         
 	State inicial;
         
-	Set<State> final_estados;
+	Set<State> estados_finales;
                                 
 	public static final Character Lambda = '_';
 	
@@ -96,6 +96,7 @@ public abstract class FA {
 	 */
 	public boolean verify_string(String s) {
 		// TODO
+                
 		return false;
 	}
 	
