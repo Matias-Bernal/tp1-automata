@@ -64,19 +64,19 @@ public abstract class FA {
 			mat = pat.matcher(line);
 			if (mat.matches()) {
 				line = br.readLine();
-				pat = Pattern.compile("^(\\n|\t|\\s)*inic->[a-zñA-ZÑ]+\\d+;$");
+				pat = Pattern.compile("^(\\n|\t|\\s)*inic->[a-zï¿½A-Zï¿½]+\\d+;$");
 				mat = pat.matcher(line);
 				if (mat.matches()) {
 					//Guardar el estado Inicial
-					initial = new State(line.substring(line.indexOf('q'), line.indexOf(';'))); //cambiar q por [a-zñA-ZÑ]+\\d+
+					initial = new State(line.substring(line.indexOf('q'), line.indexOf(';'))); //cambiar q por [a-zï¿½A-Zï¿½]+\\d+
 					if(!states.contains(initial))
 						states.add(initial);
 					//Guardar los estados y las transiciones
 					line = br.readLine();
 					if(line!=null){
-						pat = Pattern.compile("^(\\n|\t|\\s)*[a-zñA-ZÑ]+\\d+\\[shape=doublecircle\\];$");
+						pat = Pattern.compile("^(\\n|\t|\\s)*[a-zï¿½A-Zï¿½]+\\d+\\[shape=doublecircle\\];$");
 						mat = pat.matcher(line);
-						Pattern pat2 = Pattern.compile("^(\\n|\t|\\s)*[a-zñA-ZÑ]+\\d+->[a-zñA-ZÑ]+\\d+\\s\\[label=\".+\"\\];$");
+						Pattern pat2 = Pattern.compile("^(\\n|\t|\\s)*[a-zï¿½A-Zï¿½]+\\d+->[a-zï¿½A-Zï¿½]+\\d+\\s\\[label=\".+\"\\];$");
 						Matcher mat2 = pat2.matcher(line);
 						while(!mat.matches() && mat2.matches()){ //no son el/los estados finales
 							State from = new State(line.substring(line.indexOf('q'), line.indexOf('-')));
@@ -119,7 +119,7 @@ public abstract class FA {
 						final_states.add(final_state);
 						
 						line=br.readLine();
-						pat = Pattern.compile("^(\\n|\t|\\s*)[a-zñA-ZÑ]+\\d+\\[shape=doublecircle\\];$");
+						pat = Pattern.compile("^(\\n|\t|\\s*)[a-zï¿½A-Zï¿½]+\\d+\\[shape=doublecircle\\];$");
 						while(mat.matches() || line!=null){ //Guardar el/los estados finales
 							mat = pat.matcher(line);
 							if(mat.matches()){ //Es estado final
@@ -261,7 +261,14 @@ public abstract class FA {
 	 */
 	public boolean verify_string(String s) {
 		// TODO
-		return false;
+		int i = 0;
+                while (i<s.length() && alfabeto.contains(s.charAt(i))){
+                    i++;
+                }
+                if (i< s.length()){
+                    return false;
+                }
+                return true;
 	}
 	
 	/**

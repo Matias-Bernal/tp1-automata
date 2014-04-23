@@ -2,6 +2,7 @@ package automata;
 
 import java.util.*;
 import utils.Triple;
+import utils.Tuple;
 
 /* Implements a DFA (Deterministic Finite Atomaton).
 */
@@ -216,11 +217,45 @@ public class DFA extends FA {
 		// TODO: Check that the alphabet does not contains lambda.
 		// TODO: Check that initial and final states are included in 'states'.
 		// TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
-		// TODO: Check that the transition relation is deterministic.
-		return true;
+		// TODO: Check that the transition relation is deterministic.              
+                if ((!alfabeto.contains('_')) && (estados.contains(inicial)) && (checkFinalStates()) && (checkTransition()) && (checkDeterministic())){
+                    return true;
+                }
+                return false;
 	}
 
+    private boolean checkFinalStates() {
+        Iterator<State> iterator = estados_finales.iterator();
+        while (iterator.hasNext()){
+            if (!estados.contains(iterator.next())){
+                return false;
+            }
+        }
+        return true;
+    }
 
-	
+    private boolean checkTransition() {
+        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+        while (iterator.hasNext()){
+            Triple<State,Character,State> element = iterator.next();        
+            if (!estados.contains(element.first()) ||  !alfabeto.contains(element.second()) || !estados.contains(element.third())){
+                return false;
+            }
+        }
+        return true;
+    }
 
+    private boolean checkDeterministic() {
+        Set<Tuple<State,Character>> visitados = new HashSet();
+        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+        while (iterator.hasNext()){
+            Triple<State,Character,State> elementTriple = iterator.next();
+            Tuple<State,Character> elementTuple = new Tuple(elementTriple.first(), elementTriple.second());
+            if (visitados.contains(elementTuple)){
+                return false;
+            }
+            visitados.add(elementTuple);
+        }
+        return true;
+    }
 }
