@@ -15,7 +15,7 @@ public class State {
 	// Optional - Use to get equality based in abtributes, 
 	// instead than by reference (which is Java's default). 
 	
-	/*
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -23,7 +23,7 @@ public class State {
 		result = prime * result + ((_name == null) ? 0 : _name.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -40,5 +40,5 @@ public class State {
 			return false;
 		return true;
 	}
-	*/
+	
 }
