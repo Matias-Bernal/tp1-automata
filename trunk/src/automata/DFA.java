@@ -127,7 +127,8 @@ public class DFA extends FA {
 	public NFA toNFA() {
 		assert rep_ok();
 		// TODO
-		return null;
+		NFA nfaAutomata = new NFA(estados, alfabeto, transiciones, inicial, estados_finales);
+		return nfaAutomata;
 	}
 	
 	/**
@@ -138,7 +139,17 @@ public class DFA extends FA {
 	public NFALambda toNFALambda() {
 		assert rep_ok();
 		// TODO
-		return null;
+        Iterator<State> iterator = estados.iterator();
+        Set<Triple<State, Character, State>> transicionesNFALambdaSet = new HashSet<Triple<State, Character, State>>(transiciones);
+        Set<Character> alfabetoNFALambda = new HashSet<Character>(alfabeto);
+        while (iterator.hasNext()){
+            State element = iterator.next();
+            Triple<State, Character, State> transicionLambda = new Triple<State, Character, State>(element, Lambda, element);
+            transicionesNFALambdaSet.add(transicionLambda);
+        }
+        alfabetoNFALambda.add(Lambda);
+		NFALambda nfaLamdaAutomata = new NFALambda(estados, alfabetoNFALambda, transicionesNFALambdaSet, inicial, estados_finales);
+		return nfaLamdaAutomata;
 	}
 
 	/**
