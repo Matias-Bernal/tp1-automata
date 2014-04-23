@@ -64,7 +64,6 @@ public class DFA extends FA {
                 Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
                 while (iterator.hasNext()){
                     Triple<State,Character,State> element = iterator.next();
-                    
                     if (element.first().name().equals(from.name()) && element.second().equals(c)){
                         return element.third();
                     }
@@ -129,8 +128,7 @@ public class DFA extends FA {
 	 */
 	public boolean is_empty() {
 		assert rep_ok();
-		// TODO
-                                
+		// TODO            
                 if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || !is_finite()){
                     return true;
                 }
@@ -147,19 +145,18 @@ public class DFA extends FA {
 	 * @returns True iff the automaton's language is finite.
 	 */
 	public boolean is_finite() {
-		assert rep_ok();
-                Set<State> visitados = new HashSet();
-                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-                
-               // State state = delta(inicial, string.charAt(0));
-                //miro si el resulta de delta esta en visitados
-                //if (state == null) {return false;}
-               // for(int i=1; i<string.length(); i++){
-                 //   state = delta(state, string.charAt(i));
-                   // if (state == null) {return false;}
-                //}
-		// TODO
-		return true;		
+            assert rep_ok();
+            Set<State> visitados = new HashSet();
+            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+            while(iterator.hasNext()){
+                Triple<State,Character,State> element = iterator.next();
+                if(!visitados.contains(element.third())){
+                    visitados.add(element.first());
+                }else{
+                    return false;
+                }
+            }
+            return true; 
 	}
 	
 	/**
