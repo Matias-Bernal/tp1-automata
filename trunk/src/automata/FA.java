@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import utils.Triple;
+import utils.Tuple;
 
 public abstract class FA {
 
@@ -42,7 +43,6 @@ public abstract class FA {
 		FileReader fr = null;
 		BufferedReader br = null;
 		boolean nfaLambda = false;
-		boolean dfa = false;
 		boolean nfa = false;
 		Set<State> states = new HashSet<State>();
 		Set<Character> alphabet = new HashSet<Character>();
@@ -144,40 +144,21 @@ public abstract class FA {
 									assert !(states.isEmpty());
 									assert !(transitions.isEmpty());
 									assert !(alphabet.isEmpty());
-					                Iterator<Triple<State,Character,State>> iteratorTrans = transitions.iterator();
-					                Iterator<State> iteratorStates = states.iterator();
-					                Iterator<Character> iteratorAlpaha = alphabet.iterator();
-					                while (iteratorStates.hasNext()){
-					                	State cState = iteratorStates.next();
-					                	while (iteratorAlpaha.hasNext()){
-					                		Character cCharacter = iteratorAlpaha.next();
-					                		Vector<State> destinos = new Vector<State>();
-					                		while (iteratorTrans.hasNext()){
-					                			Triple<State,Character,State> cTrans = iteratorTrans.next();
-					                			if (cTrans.first().equals(cState) && cTrans.second().equals(cCharacter)){
-					                				if(!destinos.contains(cTrans.third()))
-						                        		destinos.add(cTrans.third());
-					                			}
-					                			if(destinos.size()>0){
-							                        nfa |= true;
-							                        dfa = false;
-							                        break;
-							                    }else{
-							                        dfa &= true;
-							                    }
-					                		}
-					                		if(nfa)
-					                			break;
-					                	}
-					                	if(nfa)
-				                			break;
+					                Iterator<Triple<State,Character,State>> iterator = transitions.iterator();
+					                Set<Tuple<State,Character>> visitados = new HashSet<Tuple<State,Character>>();
+					                while (iterator.hasNext()){
+					                    Triple<State,Character,State> elementTriple = iterator.next();
+					                    Tuple<State,Character> elementTuple = new Tuple<State,Character>(elementTriple.first(),elementTriple.second());
+					                    if (visitados.contains(elementTuple)){
+					                    	nfa = true;
+					                        break;
+					                    }
+					                    visitados.add(elementTuple);
 					                }
-									if(dfa){
+					                if(!nfa){
 										automata = new DFA(states, alphabet, transitions, initial, final_states);
 									}else{
-										if(nfa){
-											automata = new NFA(states, alphabet, transitions, initial, final_states);
-										}		
+										automata = new NFA(states, alphabet, transitions, initial, final_states);
 									}
 								}
 							}else{
