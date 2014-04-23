@@ -11,15 +11,18 @@ public class NFA extends FA {
 	*/
 	
 	// Constructor
-	public NFA(
-			Set<State> states,
+	public NFA(	Set<State> states,
 			Set<Character> alphabet,
 			Set<Triple<State,Character,State>> transitions,
 			State initial, 
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{
-		// TODO
+		this.alfabeto = alphabet;
+                this.estados = states;
+                this.estados_finales = final_states;
+                this.inicial = initial;
+                this.transiciones = transitions;
 	}
 
 	
@@ -31,25 +34,25 @@ public class NFA extends FA {
 	@Override
 	public Set<State> states() {
 		// TODO
-		return null;
+		return this.estados;
 	}
 
 	@Override
 	public Set<Character> alphabet() {
 		// TODO
-		return null;
+		return this.alfabeto;
 	}
 	
 	@Override
 	public State initial_state() {
 		// TODO
-		return null;
+		return this.inicial;
 	}
 
 	@Override
 	public Set<State> final_states() {
 		// TODO
-		return null;
+		return this.estados_finales;
 	}
 
 	@Override
