@@ -1,5 +1,6 @@
 package automata;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import utils.Triple;
@@ -19,7 +20,11 @@ public class NFALambda extends FA {
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{
-		// TODO
+        this.estados = states;
+        this.alfabeto = alphabet;
+        this.transiciones = transitions;
+        this.inicial = initial;
+        this.estados_finales = final_states;
 	}
 
 	
@@ -30,25 +35,25 @@ public class NFALambda extends FA {
 	@Override
 	public Set<State> states() {
 		// TODO
-		return null;
+		return this.estados;
 	}
 
 	@Override
 	public Set<Character> alphabet() {
 		// TODO
-		return null;
+		return this.alfabeto;
 	}
-
+	
 	@Override
 	public State initial_state() {
 		// TODO
-		return null;
+		return this.inicial;
 	}
 
 	@Override
 	public Set<State> final_states() {
 		// TODO
-		return null;
+		return this.estados_finales;
 	}
 
 	@Override
@@ -63,7 +68,24 @@ public class NFALambda extends FA {
 	public String to_dot() {
 		assert rep_ok();
 		// TODO
-		return null;
+		String dot_graph = "digraph{\n"+
+				"inic[shape=point];\n"+
+				"inic->"+initial_state().name()+";\n";
+		assert !(transiciones.isEmpty());
+		Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+		while (iterator.hasNext()){
+		Triple<State,Character,State> element = iterator.next();
+		dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
+		}
+		dot_graph += "\n";
+		assert !(transiciones.isEmpty());
+		Iterator<State> iteratorfinal = final_states().iterator();
+		while (iteratorfinal.hasNext()){
+		State element = iteratorfinal.next();
+		dot_graph += element.name()+"[shape=doublecircle];\n"; 
+		}
+		dot_graph += "}";
+		return dot_graph;
 	}
 
 	

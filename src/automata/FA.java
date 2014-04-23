@@ -10,6 +10,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import automata.State;
 import utils.Triple;
 import utils.Tuple;
 
@@ -56,28 +57,43 @@ public abstract class FA {
 		br = new BufferedReader(fr);
 		//Comprobar y Armar el Automata
 		String line = br.readLine();
+		/////////Eliminar si hay lineas en blanco//////////
+		Pattern patBlanco = Pattern.compile("^(\\n|\t|\\s)*$");
+		Matcher matBlanco = patBlanco.matcher(line);
+		while (matBlanco.matches() && line!=null){
+			line = br.readLine();
+			matBlanco = patBlanco.matcher(line);
+		}
+		if(line==null)
+			throw new Exception();
+		//////////////////////////////////////////////////
+		
 		Pattern pat = Pattern.compile("^digraph\\s[{]$");
 		Matcher mat = pat.matcher(line);
 		if (mat.matches()) {
 			line = br.readLine();
-			pat = Pattern.compile("^(\\n|\t|\\s)*$");
-			mat = pat.matcher(line);
-			while (mat.matches() && line!=null){
+			/////////Eliminar si hay lineas en blanco//////////
+			matBlanco = patBlanco.matcher(line);
+			while (matBlanco.matches() && line!=null){
 				line = br.readLine();
+				matBlanco = patBlanco.matcher(line);
 			}
 			if(line==null)
 				throw new Exception();
+			//////////////////////////////////////////////////
 			pat = Pattern.compile("^(\\n|\t|\\s)*inic\\[shape=point\\];$");
 			mat = pat.matcher(line);
 			if (mat.matches()) {
 				line = br.readLine();
-				pat = Pattern.compile("^(\\n|\t|\\s)*$");
-				mat = pat.matcher(line);
-				while (mat.matches() && line!=null){
+				/////////Eliminar si hay lineas en blanco//////////
+				matBlanco = patBlanco.matcher(line);
+				while (matBlanco.matches() && line!=null){
 					line = br.readLine();
+					matBlanco = patBlanco.matcher(line);
 				}
 				if(line==null)
 					throw new Exception();
+				//////////////////////////////////////////////////
 				pat = Pattern.compile("^(\\n|\t|\\s)*inic->[a-z�A-Z�]+\\d+;$");
 				mat = pat.matcher(line);
 				if (mat.matches()) {
@@ -87,139 +103,143 @@ public abstract class FA {
 						states.add(initial);
 					//Guardar los estados y las transiciones
 					line = br.readLine();
-					pat = Pattern.compile("^(\\n|\t|\\s)*$");
-					mat = pat.matcher(line);
-					while (mat.matches() && line!=null){
+					/////////Eliminar si hay lineas en blanco//////////
+					matBlanco = patBlanco.matcher(line);
+					while (matBlanco.matches() && line!=null){
 						line = br.readLine();
+						matBlanco = patBlanco.matcher(line);
 					}
-					if(line==null){
+					if(line==null)
 						throw new Exception();
-					}else{
-						Pattern pat1 = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
-						Matcher mat1 = pat1.matcher(line);
-						Pattern pat2 = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+->[a-z�A-Z�]+\\d+\\s\\[label=\".+\"\\];$");
-						Matcher mat2 = pat2.matcher(line);
-						while(!mat1.matches() && mat2.matches()){ //no son el/los estados finales
-							State from = new State(line.substring(line.indexOf('q'), line.indexOf('-')));
-							State to = new State(line.substring(line.indexOf(">")+1, line.indexOf('[')-1));
-							if(!states.contains(from))
-								states.add(from);
-							if(!states.contains(to))
-								states.add(to);
-								
-							Vector<Character> labels = new Vector<Character>();
-							if((line.substring(line.indexOf('"')+1, line.indexOf(']')-1)).length()>1){
-								String[] labelsStr = (line.substring(line.indexOf('\"'), line.indexOf(']')-1)).split(",");
-								for(int i=0;i<labelsStr.length;i++){
-									Character clabel = labelsStr[i].charAt(0);
-									labels.add(clabel);
-								}
-							}else{
-								Character clabel = (line.substring(line.indexOf('"')+1, line.indexOf(']')-1)).charAt(0);
+					//////////////////////////////////////////////////
+					
+					Pattern pat1 = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
+					Matcher mat1 = pat1.matcher(line);
+					Pattern pat2 = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+->[a-z�A-Z�]+\\d+\\s\\[label=\".+\"\\];$");
+					Matcher mat2 = pat2.matcher(line);
+					while(!mat1.matches() && mat2.matches()){ //no son el/los estados finales
+						State from = new State(line.substring(line.indexOf('q'), line.indexOf('-')));
+						State to = new State(line.substring(line.indexOf(">")+1, line.indexOf('[')-1));
+						if(!states.contains(from))
+							states.add(from);
+						if(!states.contains(to))
+							states.add(to);
+							
+						Vector<Character> labels = new Vector<Character>();
+						if((line.substring(line.indexOf('"')+1, line.indexOf(']')-1)).length()>1){
+							String[] labelsStr = (line.substring(line.indexOf('\"'), line.indexOf(']')-1)).split(",");
+							for(int i=0;i<labelsStr.length;i++){
+								Character clabel = labelsStr[i].charAt(0);
 								labels.add(clabel);
 							}
-							for(int i=0; i<labels.size();i++){
-								Character label = labels.elementAt(i);
-								if(label.equals(Lambda))
-									nfaLambda |= true;
-								if(!alphabet.contains(label))
-									alphabet.add(label);
-								Triple<State,Character,State> transition = new Triple<State, Character, State>(from, label, to);
-								if(!transitions.contains(transition))
-									transitions.add(transition);
-							}
-							line = br.readLine();
-							pat = Pattern.compile("^(\\n|\t|\\s)*$");
-							mat = pat.matcher(line);
-							while (mat.matches() && line!=null && !mat1.matches()){
-								line = br.readLine();
-								mat1 = pat1.matcher(line);
-							}
-							if(line==null){
-								throw new Exception();
-							}else{
-								mat1 = pat1.matcher(line);
-								mat2 = pat2.matcher(line);
-							}
-						}
-						//line=br.readLine(); //linea en blanco antes de los estados finales
-						//Guarda el primer de el/los estado/s final/es
-						final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
-						if(!states.contains(final_state))
-							states.add(final_state);
-						final_states.add(final_state);
-						
-						line=br.readLine();
-						pat = Pattern.compile("^(\\n|\t|\\s)*$");
-						mat = pat.matcher(line);
-						while (mat.matches() && line!=null){
-							line = br.readLine();
-						}
-						if(line==null){
-							throw new Exception();
-						}
-						pat = Pattern.compile("^(\\n|\t|\\s*)[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
-						while(mat.matches() || line!=null){ //Guardar el/los estados finales
-							mat = pat.matcher(line);
-							if(mat.matches()){ //Es estado final
-								final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
-								if(!states.contains(final_state))
-									states.add(final_state);
-								final_states.add(final_state);
-								line=br.readLine();
-								pat = Pattern.compile("^(\\n|\t|\\s)*$");
-								mat = pat.matcher(line);
-								while (mat.matches() && line!=null){
-									line = br.readLine();
-								}
-								if(line==null)
-									throw new Exception();
-							}else{
-								break;
-							}
-						}
-						//la ultima linea
-						if(line!=null){
-							pat = Pattern.compile("^(\\n|\t|\\s*)[}]$");
-							mat = pat.matcher(line);
-							if(mat.matches()){ // la ultima es el }
-								//crea la instancia correcta de automata para retornar
-								if(nfaLambda){
-									automata = new NFALambda(final_states, alphabet, transitions, initial, final_states);
-								}else{
-									assert !(states.isEmpty());
-									assert !(transitions.isEmpty());
-									assert !(alphabet.isEmpty());
-					                Iterator<Triple<State,Character,State>> iterator = transitions.iterator();
-					                Set<Tuple<State,Character>> visitados = new HashSet<Tuple<State,Character>>();
-					                while (iterator.hasNext()){
-					                    Triple<State,Character,State> elementTriple = iterator.next();
-					                    Tuple<State,Character> elementTuple = new Tuple<State,Character>(elementTriple.first(),elementTriple.second());
-					                    if (visitados.contains(elementTuple)){
-					                    	nfa = true;
-					                        break;
-					                    }
-					                    visitados.add(elementTuple);
-					                }
-					                if(!nfa){
-										automata = new DFA(states, alphabet, transitions, initial, final_states);
-									}else{
-										automata = new NFA(states, alphabet, transitions, initial, final_states);
-									}
-								}
-							}else{
-								throw new Exception();
-							}									
 						}else{
+							Character clabel = (line.substring(line.indexOf('"')+1, line.indexOf(']')-1)).charAt(0);
+							labels.add(clabel);
+						}
+						for(int i=0; i<labels.size();i++){
+							Character label = labels.elementAt(i);
+							if(label.equals(Lambda))
+								nfaLambda |= true;
+							if(!alphabet.contains(label))
+								alphabet.add(label);
+							Triple<State,Character,State> transition = new Triple<State, Character, State>(from, label, to);
+							if(!transitions.contains(transition))
+								transitions.add(transition);
+						}
+						line = br.readLine();
+						/////////Eliminar si hay lineas en blanco//////////
+						matBlanco = patBlanco.matcher(line);
+						while (matBlanco.matches() && line!=null){
+							line = br.readLine();
+							matBlanco = patBlanco.matcher(line);
+						}
+						if(line==null)
 							throw new Exception();
+						//////////////////////////////////////////////////
+						mat1 = pat1.matcher(line);
+						mat2 = pat2.matcher(line);
+
+					}
+					//line=br.readLine(); //linea en blanco antes de los estados finales
+					//Guarda el primer de el/los estado/s final/es
+					final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
+					if(!states.contains(final_state))
+						states.add(final_state);
+					final_states.add(final_state);
+						
+					line=br.readLine();
+					/////////Eliminar si hay lineas en blanco//////////
+					matBlanco = patBlanco.matcher(line);
+					while (matBlanco.matches() && line!=null){
+						line = br.readLine();
+						matBlanco = patBlanco.matcher(line);
+					}
+					if(line==null)
+						throw new Exception();
+					//////////////////////////////////////////////////
+					pat = Pattern.compile("^(\\n|\t|\\s*)[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
+					while(mat.matches() || line!=null){ //Guardar el/los estados finales
+						mat = pat.matcher(line);
+						if(mat.matches()){ //Es estado final
+							final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
+							if(!states.contains(final_state))
+								states.add(final_state);
+							final_states.add(final_state);
+							line=br.readLine();
+							/////////Eliminar si hay lineas en blanco//////////
+							matBlanco = patBlanco.matcher(line);
+							while (matBlanco.matches() && line!=null){
+								line = br.readLine();
+								matBlanco = patBlanco.matcher(line);
+							}
+							if(line==null)
+								throw new Exception();
+							//////////////////////////////////////////////////
+						}else{
+							break;
 						}
 					}
-				}else{
-					throw new Exception();
+					//la ultima linea
+					if(line!=null){
+						pat = Pattern.compile("^(\\n|\t|\\s*)[}]$");
+						mat = pat.matcher(line);
+						if(mat.matches()){ // la ultima es el }
+							//crea la instancia correcta de automata para retornar
+							if(nfaLambda){
+								automata = new NFALambda(states, alphabet, transitions, initial, final_states);
+							}else{
+								assert !(states.isEmpty());
+								assert !(transitions.isEmpty());
+								assert !(alphabet.isEmpty());
+				                Iterator<Triple<State,Character,State>> iterator = transitions.iterator();
+				                Set<Tuple<State,Character>> visitados = new HashSet<Tuple<State,Character>>();
+				                while (iterator.hasNext()){
+				                    Triple<State,Character,State> elementTriple = iterator.next();
+				                    Tuple<State,Character> elementTuple = new Tuple<State,Character>(elementTriple.first(),elementTriple.second());
+				                    if (visitados.contains(elementTuple)){
+				                    	nfa = true;
+				                        break;
+				                    }
+				                    visitados.add(elementTuple);
+				                }
+				                if(!nfa){
+									automata = new DFA(states, alphabet, transitions, initial, final_states);
+								}else{
+									automata = new NFA(states, alphabet, transitions, initial, final_states);
+								}
+							}
+						}else{
+							throw new Exception();
+						}									
+					}else{
+						throw new Exception();
+					}
 				}
-			} else {
+			}else{
 				throw new Exception();
 			}
+		} else {
+			throw new Exception();
 		}
 		return automata;
 	}
