@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -15,6 +13,11 @@ import utils.Triple;
 
 public abstract class FA {
 
+    Set<State> estados;		
+    Set<Character> alfabeto;		
+    Set<Triple<State,Character,State>> transiciones;		
+    State inicial;		
+    Set<State> estados_finales;
 	public static final Character Lambda = '_';
 	
 	/* Creation */
@@ -30,6 +33,7 @@ public abstract class FA {
 	 * represented in the file.
 	 * @throws Exception Throws an exception if there is an error during the parsing process.
 	 */
+	@SuppressWarnings("resource")
 	public static FA parse_form_file(String path) throws Exception {
 		// TODO
 		FA automata = null;
