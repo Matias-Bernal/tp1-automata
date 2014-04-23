@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import utils.Triple;
 import utils.Tuple;
 
@@ -59,10 +60,24 @@ public abstract class FA {
 		Matcher mat = pat.matcher(line);
 		if (mat.matches()) {
 			line = br.readLine();
+			pat = Pattern.compile("^(\\n|\t|\\s)*$");
+			mat = pat.matcher(line);
+			while (mat.matches() && line!=null){
+				line = br.readLine();
+			}
+			if(line==null)
+				throw new Exception();
 			pat = Pattern.compile("^(\\n|\t|\\s)*inic\\[shape=point\\];$");
 			mat = pat.matcher(line);
 			if (mat.matches()) {
 				line = br.readLine();
+				pat = Pattern.compile("^(\\n|\t|\\s)*$");
+				mat = pat.matcher(line);
+				while (mat.matches() && line!=null){
+					line = br.readLine();
+				}
+				if(line==null)
+					throw new Exception();
 				pat = Pattern.compile("^(\\n|\t|\\s)*inic->[a-z�A-Z�]+\\d+;$");
 				mat = pat.matcher(line);
 				if (mat.matches()) {
@@ -72,28 +87,35 @@ public abstract class FA {
 						states.add(initial);
 					//Guardar los estados y las transiciones
 					line = br.readLine();
-					if(line!=null){
-						pat = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
-						mat = pat.matcher(line);
+					pat = Pattern.compile("^(\\n|\t|\\s)*$");
+					mat = pat.matcher(line);
+					while (mat.matches() && line!=null){
+						line = br.readLine();
+					}
+					if(line==null){
+						throw new Exception();
+					}else{
+						Pattern pat1 = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
+						Matcher mat1 = pat1.matcher(line);
 						Pattern pat2 = Pattern.compile("^(\\n|\t|\\s)*[a-z�A-Z�]+\\d+->[a-z�A-Z�]+\\d+\\s\\[label=\".+\"\\];$");
 						Matcher mat2 = pat2.matcher(line);
-						while(!mat.matches() && mat2.matches()){ //no son el/los estados finales
+						while(!mat1.matches() && mat2.matches()){ //no son el/los estados finales
 							State from = new State(line.substring(line.indexOf('q'), line.indexOf('-')));
-							State to = new State(line.substring(line.indexOf('>')+1, line.indexOf('\b')));
+							State to = new State(line.substring(line.indexOf(">")+1, line.indexOf('[')-1));
 							if(!states.contains(from))
 								states.add(from);
 							if(!states.contains(to))
 								states.add(to);
-							
+								
 							Vector<Character> labels = new Vector<Character>();
-							if((line.substring(line.indexOf('"'), line.indexOf(']')-1)).length()>1){
-								String[] labelsStr = (line.substring(line.indexOf('"'), line.indexOf(']')-1)).split(",");
+							if((line.substring(line.indexOf('"')+1, line.indexOf(']')-1)).length()>1){
+								String[] labelsStr = (line.substring(line.indexOf('\"'), line.indexOf(']')-1)).split(",");
 								for(int i=0;i<labelsStr.length;i++){
 									Character clabel = labelsStr[i].charAt(0);
 									labels.add(clabel);
 								}
 							}else{
-								Character clabel = line.substring(line.indexOf('"'), line.indexOf(']')-1).charAt(0);
+								Character clabel = (line.substring(line.indexOf('"')+1, line.indexOf(']')-1)).charAt(0);
 								labels.add(clabel);
 							}
 							for(int i=0; i<labels.size();i++){
@@ -107,10 +129,20 @@ public abstract class FA {
 									transitions.add(transition);
 							}
 							line = br.readLine();
+							pat = Pattern.compile("^(\\n|\t|\\s)*$");
 							mat = pat.matcher(line);
-							mat2 = pat2.matcher(line);
+							while (mat.matches() && line!=null && !mat1.matches()){
+								line = br.readLine();
+								mat1 = pat1.matcher(line);
+							}
+							if(line==null){
+								throw new Exception();
+							}else{
+								mat1 = pat1.matcher(line);
+								mat2 = pat2.matcher(line);
+							}
 						}
-						
+						//line=br.readLine(); //linea en blanco antes de los estados finales
 						//Guarda el primer de el/los estado/s final/es
 						final_state = new State(line.substring(line.indexOf('q'), line.indexOf('[')));
 						if(!states.contains(final_state))
@@ -118,6 +150,14 @@ public abstract class FA {
 						final_states.add(final_state);
 						
 						line=br.readLine();
+						pat = Pattern.compile("^(\\n|\t|\\s)*$");
+						mat = pat.matcher(line);
+						while (mat.matches() && line!=null){
+							line = br.readLine();
+						}
+						if(line==null){
+							throw new Exception();
+						}
 						pat = Pattern.compile("^(\\n|\t|\\s*)[a-z�A-Z�]+\\d+\\[shape=doublecircle\\];$");
 						while(mat.matches() || line!=null){ //Guardar el/los estados finales
 							mat = pat.matcher(line);
@@ -127,6 +167,13 @@ public abstract class FA {
 									states.add(final_state);
 								final_states.add(final_state);
 								line=br.readLine();
+								pat = Pattern.compile("^(\\n|\t|\\s)*$");
+								mat = pat.matcher(line);
+								while (mat.matches() && line!=null){
+									line = br.readLine();
+								}
+								if(line==null)
+									throw new Exception();
 							}else{
 								break;
 							}
@@ -166,17 +213,13 @@ public abstract class FA {
 						}else{
 							throw new Exception();
 						}
-					}else{
-						throw new Exception();
 					}
-				} else {
+				}else{
 					throw new Exception();
 				}
 			} else {
 				throw new Exception();
 			}
-		} else {
-			throw new Exception();
 		}
 		return automata;
 	}
