@@ -1,8 +1,6 @@
 package automata;
 
-import java.util.List;
-import java.util.Set;
-
+import java.util.*;
 import utils.Triple;
 
 /* Implements a DFA (Deterministic Finite Atomaton).
@@ -25,7 +23,7 @@ public class DFA extends FA {
             this.alfabeto = alphabet;
             this.transiciones = transitions;
             this.inicial = initial;
-            this.final_estados = final_states;
+            this.estados_finales = final_states;
 	}
 	
 	/*
@@ -54,14 +52,23 @@ public class DFA extends FA {
 	@Override
 	public Set<State> final_states() {
 		// TODO
-		return this.final_estados;
+		return this.estados_finales;
 	}
 	
 	@Override
 	public State delta(State from, Character c) {
 		assert states().contains(from);
 		assert alphabet().contains(c);
-		// TODO
+                // TODO
+                assert !(transiciones.isEmpty());
+                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+                while (iterator.hasNext()){
+                    Triple<State,Character,State> element = iterator.next();
+                    
+                    if (element.first().name().equals(from.name()) && element.second().equals(c)){
+                        return element.third();
+                    }
+                }
 		return null;
 	}
 	
@@ -84,7 +91,13 @@ public class DFA extends FA {
 		assert string != null;
 		assert verify_string(string);
 		// TODO
-		return false;
+                State state = delta(inicial, string.charAt(0));
+                if (state == null) {return false;}
+                for(int i=1; i<string.length(); i++){
+                    state = delta(state, string.charAt(i));
+                    if (state == null) {return false;}
+                }
+		return estados_finales.contains(state);
 	}
 
 	/**
@@ -117,8 +130,16 @@ public class DFA extends FA {
 	public boolean is_empty() {
 		assert rep_ok();
 		// TODO
-		return false;		
+                                
+                if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || !is_finite()){
+                    return true;
+                }
+                if(estados_finales.contains(inicial)){
+                    return false;
+                }	
+		return false;
 	}
+        
 
 	/**
 	 * Checks the automaton for language infinity.
@@ -127,8 +148,18 @@ public class DFA extends FA {
 	 */
 	public boolean is_finite() {
 		assert rep_ok();
+                Set<State> visitados = new HashSet();
+                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+                
+               // State state = delta(inicial, string.charAt(0));
+                //miro si el resulta de delta esta en visitados
+                //if (state == null) {return false;}
+               // for(int i=1; i<string.length(); i++){
+                 //   state = delta(state, string.charAt(i));
+                   // if (state == null) {return false;}
+                //}
 		// TODO
-		return false;		
+		return true;		
 	}
 	
 	/**
