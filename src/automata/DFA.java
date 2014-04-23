@@ -78,7 +78,24 @@ public class DFA extends FA {
 	public String to_dot() {
 		assert rep_ok();
 		// TODO
-		return null;
+		String dot_graph = "digraph{\n"+
+							"inic[shape=point];\n"+
+							"inic->"+initial_state().name()+";\n";
+		assert !(transiciones.isEmpty());
+        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+        while (iterator.hasNext()){
+            Triple<State,Character,State> element = iterator.next();
+            dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
+        }
+        dot_graph += "\n";
+		assert !(transiciones.isEmpty());
+        Iterator<State> iteratorfinal = final_states().iterator();
+        while (iteratorfinal.hasNext()){
+            State element = iteratorfinal.next();
+            dot_graph += element.name()+"[shape=doublecircle];\n"; 
+        }
+        dot_graph += "}";
+		return dot_graph;
 	}
 	
 	
@@ -149,7 +166,7 @@ public class DFA extends FA {
 	 */
 	public boolean is_finite() {
             assert rep_ok();
-            Set<State> visitados = new HashSet();
+            Set<State> visitados = new HashSet<State>();
             Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
             while(iterator.hasNext()){
                 Triple<State,Character,State> element = iterator.next();
@@ -248,11 +265,11 @@ public class DFA extends FA {
     }
 
     private boolean checkDeterministic() {
-        Set<Tuple<State,Character>> visitados = new HashSet();
+        Set<Tuple<State,Character>> visitados = new HashSet<Tuple<State,Character>>();
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
         while (iterator.hasNext()){
             Triple<State,Character,State> elementTriple = iterator.next();
-            Tuple<State,Character> elementTuple = new Tuple(elementTriple.first(), elementTriple.second());
+            Tuple<State,Character> elementTuple = new Tuple<State,Character>(elementTriple.first(), elementTriple.second());
             if (visitados.contains(elementTuple)){
                 return false;
             }
