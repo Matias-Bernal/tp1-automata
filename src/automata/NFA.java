@@ -3,7 +3,6 @@ package automata;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import utils.Triple;
 
 public class NFA extends FA {
