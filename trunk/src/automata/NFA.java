@@ -3,6 +3,7 @@ package automata;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import utils.Triple;
 
 public class NFA extends FA {
@@ -62,7 +63,7 @@ public class NFA extends FA {
 		assert alphabet().contains(c);
 		// TODO
                 assert !(transiciones.isEmpty());
-                Set <State> result = new HashSet();
+                Set<State> result = new HashSet<State>();
                 Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
                 while (iterator.hasNext()){
                     Triple<State,Character,State> element = iterator.next();
@@ -80,7 +81,24 @@ public class NFA extends FA {
 	public String to_dot() {
 		assert rep_ok();
 		// TODO
-		return null;
+		String dot_graph = "digraph{\n"+
+				"inic[shape=point];\n"+
+				"inic->"+initial_state().name()+";\n";
+		assert !(transiciones.isEmpty());
+		Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+		while (iterator.hasNext()){
+		Triple<State,Character,State> element = iterator.next();
+		dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
+		}
+		dot_graph += "\n";
+		assert !(transiciones.isEmpty());
+		Iterator<State> iteratorfinal = final_states().iterator();
+		while (iteratorfinal.hasNext()){
+		State element = iteratorfinal.next();
+		dot_graph += element.name()+"[shape=doublecircle];\n"; 
+		}
+		dot_graph += "}";
+		return dot_graph;
 	}
 	
 	
