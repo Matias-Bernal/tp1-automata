@@ -3,6 +3,7 @@ package automata;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import utils.Triple;
 import utils.Tuple;
 
@@ -22,11 +23,14 @@ public class DFA extends FA {
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{	
-            this.estados = states;
-            this.alfabeto = alphabet;
-            this.transiciones = transitions;
-            this.inicial = initial;
-            this.estados_finales = final_states;
+        this.estados = states;
+        this.alfabeto = alphabet;
+        this.transiciones = transitions;
+        this.inicial = initial;
+        this.estados_finales = final_states;
+		if(!rep_ok()){
+			throw new IllegalArgumentException();		
+		}
 	}
 	
 	/*
@@ -159,14 +163,15 @@ public class DFA extends FA {
 	 */
 	public boolean is_empty() {
 		assert rep_ok();
-		// TODO            
-                if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || !is_finite()){
-                    return true;
-                }
-                if(estados_finales.contains(inicial)){
-                    return false;
-                }	
-		return false;
+		// TODO       
+		boolean res = false;
+        if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || !is_finite()){
+            res = true;
+        }
+        if(estados_finales.contains(inicial)){
+            res = false;
+        }	
+		return res;
 	}
         
 
