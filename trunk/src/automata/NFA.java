@@ -114,16 +114,15 @@ public class NFA extends FA {
                 if(succesor.isEmpty()){return false;}
                 int i = 1;
                 while(!match && i <= string.length()){
-                    Set <State> set = delta(succesor.get(0), string.charAt(i));
-                    Iterator <State> set_it = set.iterator();
-                    while(set_it.hasNext()){
-                       succesor.add(set_it.next());
-                    }
-                    if(i == string.length()){
-                        match = true;
-                    }
-                    succesor.remove(0);
-                    
+                        Set <State> set = delta(succesor.get(0), string.charAt(i));
+                        Iterator <State> set_it = set.iterator();
+                        while(set_it.hasNext()){
+                            succesor.add(set_it.next());
+                            if(i == string.length() && estados_finales.contains(succesor.get(0))){
+                                match = true;
+                            }
+                            succesor.remove(0);
+                        }
                    i++;
                 }
                 return match;
