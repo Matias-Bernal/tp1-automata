@@ -1,8 +1,6 @@
 package automata;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import utils.Triple;
 
@@ -68,9 +66,7 @@ public class NFA extends FA {
                 while (iterator.hasNext()){
                     Triple<State,Character,State> element = iterator.next();
                     if (element.first().name().equals(from.name()) && element.second().equals(c)){
-                        
                         result.add(element.third());
-                        //return element.third();
                     }
                 }
 		return result;
@@ -112,9 +108,48 @@ public class NFA extends FA {
 		assert rep_ok();
 		assert string != null;
 		assert verify_string(string);
-		// TODO
-		return false;
+                //TODO
+                Set <State> state_successors = new HashSet();
+                Stack st = new Stack();
+                
+                //st.add(inicial);
+                    
+                state_successors = successors(inicial,string);
+                st.pop();
+                st.addAll(state_successors);
+                state_successors.clear();
+                
+          /*      while(!st.empty()){
+                    State elem = (State) st.pop();
+                    if(!visitados.contains(elem)){
+                        visitados.add(elem);
+                    }else{return false;}
+                    state_successors = successors(elem);
+                    st.addAll(state_successors);
+                    state_successors.clear();
+                }
+                //while(iterator.hasNext()){
+                  //  Triple<State,Character,State> element = iterator.next();
+                    
+                    //if(visitados.contains(element.third())){
+                      //  visitados.add(element.third());
+                    //}else{return false;}
+        //        }*/
+		return true;
 	}
+        
+        
+        public Set<State> successors(State state, String string){
+            Set <State> state_successors = new HashSet();
+            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+            while(iterator.hasNext()){
+                 Triple<State,Character,State> element = iterator.next();
+                if(element.first().equals(state) && element.second().equals(string)){
+                    state_successors.add(element.third());
+                }
+            }
+            return state_successors;
+        }
 	
 	/**
 	 * Converts the automaton to a DFA.
