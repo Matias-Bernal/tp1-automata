@@ -1,5 +1,6 @@
 package automata;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -61,7 +62,17 @@ public class NFALambda extends FA {
 		assert states().contains(from);
 		assert alphabet().contains(c);
 		// TODO
-		return null;
+                assert !(transiciones.isEmpty());
+                Set<State> result = new HashSet<State>();
+                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+                while (iterator.hasNext()){
+                    Triple<State,Character,State> element = iterator.next();
+                    if (element.first().name().equals(from.name()) && element.second().equals(c)){
+                        result.add(element.third());
+                    }
+                }
+		return result;
+		
 	}
 
 	@Override
