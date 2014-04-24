@@ -209,7 +209,10 @@ public class DFA extends FA {
 	public DFA complement() {
 		assert rep_ok();
 		// TODO
+                Set<Triple<State,Character,State>> new_transiciones = new HashSet<Triple<State,Character,State>>();
+                Set<State> new_estados = new HashSet<State>();
                 Set<State> new_est_final = new HashSet<State>();
+                // cambio los estados no terminales en terminas y viceversa
                 Iterator<State> iterator = estados.iterator();
                 while(iterator.hasNext()){
                     State element = iterator.next();
@@ -217,7 +220,30 @@ public class DFA extends FA {
                         new_est_final.add(element);
                     }
                 }
-                DFA complemento = new DFA(estados, alfabeto, transiciones, inicial, new_est_final);
+                // agrego el estado trampa a los estados y a lo hago estado final
+                State estado_Trampa = new State("trampa");
+                new_estados.addAll(estados);
+                new_estados.add(estado_Trampa);
+                new_est_final.add(estado_Trampa);
+                //agrego todas las transiciones al estado trampa que hacen falta para que sea completo
+                new_transiciones.addAll(transiciones);
+                Iterator<Character> iterator_alfabeto = alfabeto.iterator();
+                while(iterator_alfabeto.hasNext()){
+                    Character element_alfabeto = iterator_alfabeto.next();
+                    //agrego las transiciones que no estan al estado trampa
+                    Iterator<Triple<State,Character,State>> iterator_transiciones = transiciones.iterator();
+                    while(iterator_transiciones.hasNext()){
+                        Triple<State,Character,State> element_transiciones = iterator_transiciones.next();
+                        if (delta(element_transiciones.first(),element_alfabeto)== null){
+                            Triple<State,Character,State> new_trans_trampa = new Triple<>(element_transiciones.first(),element_alfabeto,estado_Trampa);
+                            new_transiciones.add(new_trans_trampa);
+                        }
+                    }
+                    // agrego la transicion a si mismo para cualquier letra del alfabeto
+                    Triple<State,Character,State> new_trans_trampa = new Triple<>(estado_Trampa,element_alfabeto,estado_Trampa);
+                    new_transiciones.add(new_trans_trampa);
+                }
+                DFA complemento = new DFA(new_estados, alfabeto, new_transiciones, inicial, new_est_final);
                 return complemento;		
 	}
 	
@@ -244,8 +270,53 @@ public class DFA extends FA {
 		assert rep_ok();
 		assert other.rep_ok();
 		// TODO
-		return null;		
-	}	
+                //creo los estados, las transiciones, los estados finales, el estado inicial y el alfabeto de la union.
+                Set<Tuple<State,State>> union_estados = new HashSet<>();
+                Set<Triple<Tuple<State,State>,Character,Tuple<State,State>>> union_transiciones = new HashSet<>();
+                Set<Tuple<State,State>> union_est_finales = new HashSet<>();
+                Tuple<State,State> union_inicial = new Tuple<>(inicial, other.initial_state());
+                Set<Character> union_alfabeto = new HashSet<>();
+                union_alfabeto.addAll(this.alfabeto);
+                union_alfabeto.addAll(other.alphabet());
+                
+                //obtengo los estados de la union        
+                Iterator<State> estado_iterator = this.estados.iterator();
+                while(estado_iterator.hasNext()){
+                    State element = estado_iterator.next();
+                    Iterator<State> other_est_iterator = other.states().iterator();
+                    while(other_est_iterator.hasNext()){
+                        State other_element = other_est_iterator.next();
+                        Tuple<State,State> union_estado = new Tuple<>(element,other_element);
+                        union_estados.add(union_estado);    
+                    }
+                }
+                
+                //obtengo los estados finales y las transiciones de la union
+                Iterator<Tuple<State,State>> union_estado_iterator = union_estados.iterator();
+                while(union_estado_iterator.hasNext()){
+                    Tuple<State,State> union_element = union_estado_iterator.next();
+                    //obtengo los estados finales de la union
+                    boolean containFirst = estados_finales.contains(union_element.first());
+                    boolean containSecond = other.final_states().contains(union_element.second());
+                    if (containFirst || containSecond){
+                        union_est_finales.add(union_element);
+                    }
+                    //obtengo las transiciones de la union
+                    Iterator<Character> alfabeto_iterator = union_alfabeto.iterator();
+                    while(alfabeto_iterator.hasNext()){
+                        Character c = alfabeto_iterator.next();
+                        State first = delta(union_element.first(), c);
+                        State second = delta(union_element.second(), c);
+                        Tuple<State,State> element_trans = new Tuple<>(first, second);
+                        Triple<Tuple<State,State>,Character,Tuple<State,State>> union_trans = new Triple<>(union_element, c, element_trans); 
+                        union_transiciones.add(union_trans);
+                    }
+                
+                // falta renombrar cada tuple<estado, estado> con un estado  
+                }
+                DFA dfa = new DFA(union_estados, union_alfabeto,union_transiciones,union_inicial,union_est_finales);
+                return dfa;
+        }
 	
 	/**
 	 * Returns a new automaton which recognizes the intersection of both
@@ -260,7 +331,7 @@ public class DFA extends FA {
 		// TODO
 		return null;		
 	}
-
+   
 	@Override
 	public boolean rep_ok() {
 		// TODO: Check that the alphabet does not contains lambda.

@@ -136,7 +136,7 @@ public class NFA extends FA {
 	*/
 	public DFA toDFA() {
 		assert rep_ok();
-		// TODO           
+		// TODO                
 		return null;
 	}
 
