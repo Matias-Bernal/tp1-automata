@@ -79,22 +79,22 @@ public class DFA extends FA {
 		assert rep_ok();
 		// TODO
 		String dot_graph = "digraph{\n"+
-							"inic[shape=point];\n"+
-							"inic->"+initial_state().name()+";\n";
+                                    "inic[shape=point];\n"+
+                                    "inic->"+initial_state().name()+";\n";
 		assert !(transiciones.isEmpty());
-        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-        while (iterator.hasNext()){
-            Triple<State,Character,State> element = iterator.next();
-            dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
-        }
-        dot_graph += "\n";
+                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+                while (iterator.hasNext()){
+                    Triple<State,Character,State> element = iterator.next();
+                    dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
+                }
+                dot_graph += "\n";
 		assert !(transiciones.isEmpty());
-        Iterator<State> iteratorfinal = final_states().iterator();
-        while (iteratorfinal.hasNext()){
-            State element = iteratorfinal.next();
-            dot_graph += element.name()+"[shape=doublecircle];\n"; 
-        }
-        dot_graph += "}";
+                Iterator<State> iteratorfinal = final_states().iterator();
+                while (iteratorfinal.hasNext()){
+                    State element = iteratorfinal.next();
+                    dot_graph += element.name()+"[shape=doublecircle];\n"; 
+                }
+                dot_graph += "}";
 		return dot_graph;
 	}
 	
@@ -139,15 +139,15 @@ public class DFA extends FA {
 	public NFALambda toNFALambda() {
 		assert rep_ok();
 		// TODO
-        Iterator<State> iterator = estados.iterator();
-        Set<Triple<State, Character, State>> transicionesNFALambdaSet = new HashSet<Triple<State, Character, State>>(transiciones);
-        Set<Character> alfabetoNFALambda = new HashSet<Character>(alfabeto);
-        while (iterator.hasNext()){
-            State element = iterator.next();
-            Triple<State, Character, State> transicionLambda = new Triple<State, Character, State>(element, Lambda, element);
-            transicionesNFALambdaSet.add(transicionLambda);
-        }
-        alfabetoNFALambda.add(Lambda);
+                Iterator<State> iterator = estados.iterator();
+                Set<Triple<State, Character, State>> transicionesNFALambdaSet = new HashSet<Triple<State, Character, State>>(transiciones);
+                Set<Character> alfabetoNFALambda = new HashSet<Character>(alfabeto);
+                while (iterator.hasNext()){
+                    State element = iterator.next();
+                    Triple<State, Character, State> transicionLambda = new Triple<State, Character, State>(element, Lambda, element);
+                    transicionesNFALambdaSet.add(transicionLambda);
+                }
+                alfabetoNFALambda.add(Lambda);
 		NFALambda nfaLamdaAutomata = new NFALambda(estados, alfabetoNFALambda, transicionesNFALambdaSet, inicial, estados_finales);
 		return nfaLamdaAutomata;
 	}
@@ -199,7 +199,16 @@ public class DFA extends FA {
 	public DFA complement() {
 		assert rep_ok();
 		// TODO
-		return null;		
+                Set<State> new_est_final = new HashSet<State>();
+                Iterator<State> iterator = estados.iterator();
+                while(iterator.hasNext()){
+                    State element = iterator.next();
+                    if (!estados_finales.contains(element)){
+                        new_est_final.add(element);
+                    }
+                }
+                DFA complemento = new DFA(estados, alfabeto, transiciones, inicial, new_est_final);
+                return complemento;		
 	}
 	
 	/**
@@ -276,11 +285,11 @@ public class DFA extends FA {
     }
 
     private boolean checkDeterministic() {
-        Set<Tuple<State,Character>> visitados = new HashSet<Tuple<State,Character>>();
+        Set<Tuple<State,Character>> visitados = new HashSet<>();
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
         while (iterator.hasNext()){
             Triple<State,Character,State> elementTriple = iterator.next();
-            Tuple<State,Character> elementTuple = new Tuple<State,Character>(elementTriple.first(), elementTriple.second());
+            Tuple<State,Character> elementTuple = new Tuple<>(elementTriple.first(), elementTriple.second());
             if (visitados.contains(elementTuple)){
                 return false;
             }

@@ -123,7 +123,7 @@ public class NFA extends FA {
 	*/
 	public DFA toDFA() {
 		assert rep_ok();
-		// TODO
+		// TODO           
 		return null;
 	}
 
@@ -133,8 +133,30 @@ public class NFA extends FA {
 		// TODO: Check that the alphabet does not contains lambda.
 		// TODO: Check that initial and final states are included in 'states'.
 		// TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
-		return true;
+		if ((!alfabeto.contains('_')) && (estados.contains(inicial)) && (checkFinalStates()) && (checkTransition())){
+                    return true;
+                }
+                return false;
 	} 
 
+        private boolean checkFinalStates() {
+            Iterator<State> iterator = estados_finales.iterator();
+            while (iterator.hasNext()){
+                if (!estados.contains(iterator.next())){
+                    return false;
+                }
+            }
+            return true;
+        }
 
+        private boolean checkTransition() {
+            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+            while (iterator.hasNext()){
+                Triple<State,Character,State> element = iterator.next();        
+                if (!estados.contains(element.first()) ||  !alfabeto.contains(element.second()) || !estados.contains(element.third())){
+                    return false;
+                }
+            }
+            return true;
+        }
 }
