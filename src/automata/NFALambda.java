@@ -170,25 +170,70 @@ public class NFALambda extends FA {
 		Set<State> estadosDFA = new HashSet<State>();
 		Set<Triple<State,Character,State>> transicionesDFA = new HashSet<Triple<State,Character,State>>();
 		Set<State> estados_finalesDFA = new HashSet<State>();
-		// A = clausura_lambda (Q0)
+		
+		//ALGORITMO DE NFALambda a DFA//
+		Set<Triple<Set<State>,Character,Set<State>>> T = new HashSet<Triple<Set<State>,Character,Set<State>>>();
+		//Calcular Cerradura-lambda (0) = Estado A; 
 		Set<State> inicialDFALambda = new HashSet<State>();
 		inicialDFALambda.add(inicial);
-		Set<State> a = clausura_lambda(inicialDFALambda);
-		// Incluír A en estados del DFA;
-		Iterator<State> iteratorA = a.iterator();
-		while (iteratorA.hasNext()){
-			State elementA = iteratorA.next();
-			if(!estadosDFA.contains(elementA))
-				estadosDFA.add(elementA);
+		Set<State> A = clausura_lambda(inicialDFALambda);
+		// Incluír A en NuevosEstados; 
+		Set<Set<State>> NuevosEstados = new HashSet<Set<State>>();
+		NuevosEstados.add(A);
+		// WHILE no están todos los W de NuevosEstados marcados DO BEGIN 
+		Set<Set<State>> EstadosMarcados = new HashSet<Set<State>>();
+		while(!todosMarcados(NuevosEstados,EstadosMarcados)){
+			//Marcar W; 
+			Set<State> W = marcarEstado(NuevosEstados, EstadosMarcados);
+			//FOR cada ai pertence Te DO BEGIN
+			Iterator<Character> iteratorAlfabeto = alfabeto.iterator();
+			while (iteratorAlfabeto.hasNext()){
+				Character a = iteratorAlfabeto.next();
+				//X = Cerradura-lambda (Mueve (W, ai)); 
+				Set<State> X = clausura_lambda(mover(W, a));
+				// IF X no está en el conjunto NuevosEstados añadirlo;
+				if(!perteneceNuevoEstados(NuevosEstados, X)){
+					NuevosEstados.add(X);
+				}
+				//Transición [W, a] = X;
+				T.add(new Triple<Set<State>, Character, Set<State>>(W, a, X));
+			}
 		}
-		// WHILE no están todos los W de NuevosEstados marcados DO BEGIN
-		Set<State> marcados = new HashSet<State>();
-		while (marcados.equals(estadosDFA)){
-			
-		}
+
+		// FIN //
 		
 		DFA dfaAutomata = new DFA(estadosDFA, alfabeto, transicionesDFA, inicial, estados_finalesDFA);
 		return dfaAutomata;
+	}
+	
+	public boolean perteneceNuevoEstados(Set<Set<State>> NuevosEstados,Set<State> estado){
+		return (NuevosEstados.contains(estado));
+	}
+		
+	public boolean todosMarcados(Set<Set<State>> NuevosEstados,Set<Set<State>> EstadosMarcados){
+		Iterator<Set<State>> iteratorNuevosEstados = NuevosEstados.iterator();
+		Boolean res = true;
+		while (iteratorNuevosEstados.hasNext()){
+			Set<State> elemenNuevoEstado = iteratorNuevosEstados.next();
+			if(!EstadosMarcados.contains(elemenNuevoEstado)){
+				res = false;
+				break;
+			}
+		}
+		return res;
+	}
+	
+	public Set<State> marcarEstado(Set<Set<State>> NuevosEstados,Set<Set<State>> EstadosMarcados){
+		Set<State> marcado = null;
+		Iterator<Set<State>> iteratorNuevosEstados = NuevosEstados.iterator();
+		while (iteratorNuevosEstados.hasNext()){
+			Set<State> elemenNuevoEstado = iteratorNuevosEstados.next();
+			if(!EstadosMarcados.contains(elemenNuevoEstado)){
+				marcado = elemenNuevoEstado;
+				break;
+			}
+		}
+		return marcado;
 	}
 	
 	@Override
