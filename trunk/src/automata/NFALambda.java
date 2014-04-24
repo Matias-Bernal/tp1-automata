@@ -114,6 +114,51 @@ public class NFALambda extends FA {
 		return false;
 	}
 	
+	
+	public Set<State> clausura_lambda(Set<State> estado){
+		assert !(transiciones.isEmpty());
+		Set<State> result = estado;
+		Iterator<State> iteratorState = estado.iterator();
+		Iterator<Triple<State,Character,State>> iteratorTrasitions = transiciones.iterator();
+		while (iteratorState.hasNext()){
+			State element = iteratorState.next();
+			while (iteratorTrasitions.hasNext()){
+				Triple<State,Character,State> transition = iteratorTrasitions.next();
+				if(transition.first().equals(element) && transition.second().equals(Lambda)){
+					if (!result.contains(transition.third())){
+						result.add(transition.third());
+						Set<State> aux = new HashSet<State>();
+						aux.add(transition.third());
+						Set<State> aux2 = clausura_lambda(aux);
+						Iterator<State> iteratorAux = aux2.iterator();
+						while (iteratorAux.hasNext()){
+							State elementAux = iteratorAux.next();
+							if (!result.contains(elementAux))
+								result.add(elementAux);
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	public Set<State> mover (Set<State> estado, Character a){
+		Set<State> result = new HashSet<State>();
+		Iterator<State> iteratorState = estado.iterator();
+		while (iteratorState.hasNext()){
+			State element = iteratorState.next();
+			Set<State> aux = delta(element,a);
+			Iterator<State> iteratorAux = aux.iterator();
+			while (iteratorAux.hasNext()){
+				State elementaux = iteratorAux.next();
+				if(!result.contains(elementaux))
+					result.add(elementaux);
+			}
+		}
+		return result;
+	}
+	
 	/**
 	 * Converts the automaton to a DFA.
 	 * 
@@ -122,7 +167,28 @@ public class NFALambda extends FA {
 	public DFA toDFA() {
 		assert rep_ok();
 		// TODO
-		return null;
+		Set<State> estadosDFA = new HashSet<State>();
+		Set<Triple<State,Character,State>> transicionesDFA = new HashSet<Triple<State,Character,State>>();
+		Set<State> estados_finalesDFA = new HashSet<State>();
+		// A = clausura_lambda (Q0)
+		Set<State> inicialDFALambda = new HashSet<State>();
+		inicialDFALambda.add(inicial);
+		Set<State> a = clausura_lambda(inicialDFALambda);
+		// Incluír A en estados del DFA;
+		Iterator<State> iteratorA = a.iterator();
+		while (iteratorA.hasNext()){
+			State elementA = iteratorA.next();
+			if(!estadosDFA.contains(elementA))
+				estadosDFA.add(elementA);
+		}
+		// WHILE no están todos los W de NuevosEstados marcados DO BEGIN
+		Set<State> marcados = new HashSet<State>();
+		while (marcados.equals(estadosDFA)){
+			
+		}
+		
+		DFA dfaAutomata = new DFA(estadosDFA, alfabeto, transicionesDFA, inicial, estados_finalesDFA);
+		return dfaAutomata;
 	}
 	
 	@Override
