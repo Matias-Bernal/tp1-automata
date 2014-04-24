@@ -109,15 +109,18 @@ public class NFA extends FA {
 		assert string != null;
 		assert verify_string(string);
                 //TODO
-                Set <State> state_successors = new HashSet();
-                Stack st = new Stack();
-                
-                //st.add(inicial);
-                    
-                state_successors = successors(inicial,string);
-                st.pop();
-                st.addAll(state_successors);
-                state_successors.clear();
+                Set <State> states_successors = new HashSet();
+                Stack succ = new Stack();
+                succ.addAll(delta(inicial,string.charAt(0)));
+                boolean match;
+               // while(!match){
+                //    macheo();
+                //}
+                //result match;
+                //states_successors = successors(inicial,string);
+               
+                //st.addAll(states_successors);
+                //states_successors.clear();
                 
           /*      while(!st.empty()){
                     State elem = (State) st.pop();
@@ -138,19 +141,7 @@ public class NFA extends FA {
 		return true;
 	}
         
-        
-        public Set<State> successors(State state, String string){
-            Set <State> state_successors = new HashSet();
-            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-            while(iterator.hasNext()){
-                 Triple<State,Character,State> element = iterator.next();
-                if(element.first().equals(state) && element.second().equals(string)){
-                    state_successors.add(element.third());
-                }
-            }
-            return state_successors;
-        }
-	
+    
 	/**
 	 * Converts the automaton to a DFA.
 	 * 
