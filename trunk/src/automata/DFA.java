@@ -23,6 +23,11 @@ public class DFA extends FA {
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{	
+		assert states != null;
+		assert alphabet != null;
+		assert transitions != null;
+		assert final_states != null;
+		
         this.estados = states;
         this.alfabeto = alphabet;
         this.transiciones = transitions;
@@ -165,7 +170,7 @@ public class DFA extends FA {
 		assert rep_ok();
 		// TODO       
 		boolean res = false;
-        if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || !is_finite()){
+        if(estados.isEmpty() || inicial==null || transiciones.isEmpty() ){
             res = true;
         }
         if(estados_finales.contains(inicial)){
