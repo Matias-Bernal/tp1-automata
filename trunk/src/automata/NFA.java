@@ -1,7 +1,6 @@
 package automata;
 
 import java.util.*;
-
 import utils.Triple;
 
 public class NFA extends FA {
@@ -109,36 +108,25 @@ public class NFA extends FA {
 		assert string != null;
 		assert verify_string(string);
                 //TODO
-                Set <State> states_successors = new HashSet();
-                Stack succ = new Stack();
-                succ.addAll(delta(inicial,string.charAt(0)));
-                boolean match;
-               // while(!match){
-                //    macheo();
-                //}
-                //result match;
-                //states_successors = successors(inicial,string);
-               
-                //st.addAll(states_successors);
-                //states_successors.clear();
-                
-          /*      while(!st.empty()){
-                    State elem = (State) st.pop();
-                    if(!visitados.contains(elem)){
-                        visitados.add(elem);
-                    }else{return false;}
-                    state_successors = successors(elem);
-                    st.addAll(state_successors);
-                    state_successors.clear();
-                }
-                //while(iterator.hasNext()){
-                  //  Triple<State,Character,State> element = iterator.next();
+                boolean match = false;
+                List <State>succesor = new LinkedList<State>();
+                succesor.addAll(delta(inicial,string.charAt(0)));
+                if(succesor.isEmpty()){return false;}
+                int i = 1;
+                while(!match && i <= string.length()){
+                    Set <State> set = delta(succesor.get(0), string.charAt(i));
+                    Iterator <State> set_it = set.iterator();
+                    while(set_it.hasNext()){
+                       succesor.add(set_it.next());
+                    }
+                    if(i == string.length()){
+                        match = true;
+                    }
+                    succesor.remove(0);
                     
-                    //if(visitados.contains(element.third())){
-                      //  visitados.add(element.third());
-                    //}else{return false;}
-        //        }*/
-		return true;
+                   i++;
+                }
+                return match;
 	}
         
     
