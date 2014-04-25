@@ -105,7 +105,7 @@ public class DFAAutomataMethodsTests {
 	@Test
 	public void test15() throws Exception {
 		DFA dfa2 = (DFA) FA.parse_form_file("src/test/dfa2.dot");
-		DFA dfa3 = (DFA) FA.parse_form_file("test/dfa3");
+		DFA dfa3 = (DFA) FA.parse_form_file("src/test/dfa3.dot");
 		DFA union = dfa2.union(dfa3);
 		assertTrue(union.accepts("a") && union.accepts("bbbb"));
 	}	
