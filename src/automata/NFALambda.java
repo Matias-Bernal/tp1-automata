@@ -21,11 +21,21 @@ public class NFALambda extends FA {
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{
+		assert states != null;
+		assert alphabet != null;
+		assert transitions != null;
+		assert final_states != null;
+		
         this.estados = states;
         this.alfabeto = alphabet;
+        if(!alfabeto.contains(FA.Lambda))
+        	alfabeto.add(FA.Lambda);
         this.transiciones = transitions;
         this.inicial = initial;
         this.estados_finales = final_states;
+        if(!rep_ok()){
+        	throw new IllegalArgumentException();
+        }
 	}
 
 	

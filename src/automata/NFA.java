@@ -1,6 +1,7 @@
 package automata;
 
 import java.util.*;
+
 import utils.Triple;
 
 public class NFA extends FA {
@@ -17,11 +18,19 @@ public class NFA extends FA {
 			Set<State> final_states)
 	throws IllegalArgumentException
 	{
+		assert states != null;
+		assert alphabet != null;
+		assert transitions != null;
+		assert final_states != null;
+		
 		this.alfabeto = alphabet;
-                this.estados = states;
-                this.estados_finales = final_states;
-                this.inicial = initial;
-                this.transiciones = transitions;
+        this.estados = states;
+        this.estados_finales = final_states;
+        this.inicial = initial;
+        this.transiciones = transitions;
+        if(!rep_ok()){
+        	throw new IllegalArgumentException();
+        }
 	}
 
 	
