@@ -117,35 +117,38 @@ public class NFA extends FA {
 		assert string != null;
 		assert verify_string(string);
                 //TODO
-                Set<State> sucesor1 = new HashSet<State>();
-                sucesor1.addAll(delta(inicial,string.charAt(0)));
-                
-                if(sucesor1.isEmpty()){return false;}
-                
-                Set<State> sucesor2 = new HashSet<State>();
-                int i = 1;
-                while(i <= string.length()){
-                    if ((i%2) != 0){
-                        sucesor2.addAll(deltaSet(sucesor1, string.charAt(i)));
-                        sucesor1.clear();
-                        if(sucesor2.isEmpty()){
-                            return false;
-                        }
-                    }else{
-                        sucesor1.addAll(deltaSet(sucesor2, string.charAt(i))); 
-                        sucesor2.clear();
-                        if(sucesor1.isEmpty()){
-                            return false;
-                        }
-                    }
-                    i++;
-                }
-                i--;
-                if ((i%2) != 0){
-                    return containFinal(sucesor2, estados_finales);
-                }else{
-                    return containFinal(sucesor1, estados_finales);
-                }
+				if(string==""){
+					return estados_finales.contains(inicial);
+				}else{
+	                Set<State> sucesor1 = new HashSet<State>();
+	                sucesor1.addAll(delta(inicial,string.charAt(0)));
+	                
+	                if(sucesor1.isEmpty()){return false;}
+	                
+	                Set<State> sucesor2 = new HashSet<State>();
+	                int i = 1;
+	                while(i < string.length()){
+	                    if ((i%2) != 0){
+	                        sucesor2.addAll(deltaSet(sucesor1, string.charAt(i)));
+	                        sucesor1.clear();
+	                        if(sucesor2.isEmpty()){
+	                            return false;
+	                        }
+	                    }else{
+	                        sucesor1.addAll(deltaSet(sucesor2, string.charAt(i))); 
+	                        sucesor2.clear();
+	                        if(sucesor1.isEmpty()){
+	                            return false;
+	                        }
+	                    }
+	                    i++;
+	                }
+	                if (sucesor1.isEmpty()){
+	                    return containFinal(sucesor2, estados_finales);
+	                }else{
+	                    return containFinal(sucesor1, estados_finales);
+	                }
+				}
 	}
         
         public Set<State> deltaSet(Set<State> from, Character c) {
