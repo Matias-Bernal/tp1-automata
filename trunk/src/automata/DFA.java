@@ -169,17 +169,67 @@ public class DFA extends FA {
 	public boolean is_empty() {
 		assert rep_ok();
 		// TODO       
-		boolean res = false;
-        if(estados.isEmpty() || inicial==null || transiciones.isEmpty() ){
-            res = true;
-        }
-        if(estados_finales.contains(inicial)){
-            res = false;
-        }	
-		return res;
+		if(estados_finales.contains(inicial)){
+                return false;
+            }
+            if(estados.isEmpty() || inicial==null || transiciones.isEmpty()){
+                return true;
+            }
+            
+            //me fijo si existe una cadena que partiendo desde el estado inicial llego a algun estado final
+            Set<State> sucesor1 = new HashSet<State>();
+            Set<State> sucesor2 = new HashSet<State>();
+            sucesor1.add(inicial);
+            boolean res = false;
+            int i = 0; 
+            while (res == false){
+                if ((i%2) == 0){
+                    sucesor2.addAll(sucesores(sucesor1, transiciones));
+                    sucesor1.clear();
+                    if(sucesor2.isEmpty()){
+                        return false;
+                    }else{
+                        res= containFinal(sucesor2, estados_finales);
+                    }
+                }else{
+                    sucesor1.addAll(sucesores(sucesor2, transiciones)); 
+                    sucesor2.clear();
+                    if(sucesor1.isEmpty()){
+                        return false;
+                    }else{
+                        res= containFinal(sucesor1, estados_finales);
+                    }
+                }
+                i++;
+            }
+            return res;
 	}
         
-
+       // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
+        private Set<State> sucesores(Set<State> estados, Set<Triple<State, Character, State>> transiciones){
+            Set<State> result = new HashSet<State>();
+            Iterator<Triple<State, Character, State>> iterator = transiciones.iterator();
+            while (iterator.hasNext()){
+                    Triple<State, Character, State> element = iterator.next();
+                    if(estados.contains(element.first())){
+                        result.add(element.third());
+                    }
+            }
+            return result;
+        }
+        
+        //funcion que cheque si un set contiene por lo menos un estado final
+        private boolean containFinal(Set<State> states, Set<State> finals){
+            Iterator<State> iterator = states.iterator();
+            while(iterator.hasNext()){
+                State element = iterator.next();
+                if(finals.contains(element)){
+                    return true;
+                }
+            }
+            return false;
+        }
+        
 	/**
 	 * Checks the automaton for language infinity.
 	 * 
