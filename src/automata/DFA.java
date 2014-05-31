@@ -119,13 +119,17 @@ public class DFA extends FA {
 		assert string != null;
 		assert verify_string(string);
 		// TODO
+			if(string==""){
+				return estados_finales.contains(inicial);
+			}else{
                 State state = delta(inicial, string.charAt(0));
                 if (state == null) {return false;}
                 for(int i=1; i<string.length(); i++){
                     state = delta(state, string.charAt(i));
                     if (state == null) {return false;}
                 }
-		return estados_finales.contains(state);
+                return estados_finales.contains(state);
+			}
 	}
 
 	/**
@@ -202,7 +206,7 @@ public class DFA extends FA {
                 }
                 i++;
             }
-            return res;
+            return !res;
 	}
         
        // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
