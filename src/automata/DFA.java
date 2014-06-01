@@ -323,110 +323,63 @@ public class DFA extends FA {
 	public DFA union(DFA other) {
 		assert rep_ok();
 		assert other.rep_ok();
-		// TODO
-                //creo los estados, las transiciones, los estados finales, el estado inicial y el alfabeto de la union.
-                Set<Tuple<State,State>> union_estados = new HashSet<Tuple<State,State>>();
-                Set<Triple<Tuple<State,State>,Character,Tuple<State,State>>> union_transiciones = new HashSet<>();
-                Set<Tuple<State,State>> union_est_finales = new HashSet<Tuple<State,State>>();
-                Tuple<State,State> union_inicial = new Tuple<State, State>(inicial, other.initial_state());
-                Set<Character> union_alfabeto = new HashSet<Character>();
-                union_alfabeto.addAll(this.alfabeto);
-                union_alfabeto.addAll(other.alphabet());
-                
-                //obtengo los estados de la union        
-                Iterator<State> estado_iterator = this.estados.iterator();
-                while(estado_iterator.hasNext()){
-                    State element = estado_iterator.next();
-                    Iterator<State> other_est_iterator = other.states().iterator();
-                    while(other_est_iterator.hasNext()){
-                        State other_element = other_est_iterator.next();
-                        Tuple<State,State> union_estado = new Tuple<>(element,other_element);
-                        union_estados.add(union_estado);    
-                    }
-                }
-                
-                //obtengo los estados finales y las transiciones de la union
-                Iterator<Tuple<State,State>> union_estado_iterator = union_estados.iterator();
-                while(union_estado_iterator.hasNext()){
-                    Tuple<State,State> union_element = union_estado_iterator.next();
-                    //obtengo los estados finales de la union
-                    boolean containFirst = estados_finales.contains(union_element.first());
-                    boolean containSecond = other.final_states().contains(union_element.second());
-                    if (containFirst || containSecond){
-                        union_est_finales.add(union_element);
-                    }
-                    //obtengo las transiciones de la union
-                    Iterator<Character> alfabeto_iterator = union_alfabeto.iterator();
-                    while(alfabeto_iterator.hasNext()){
-                        Character c = alfabeto_iterator.next();
-                        State first = delta(union_element.first(), c);
-                        State second = delta(union_element.second(), c);
-                        Tuple<State,State> element_trans = new Tuple<>(first, second);
-                        Triple<Tuple<State,State>,Character,Tuple<State,State>> union_trans = new Triple<>(union_element, c, element_trans); 
-                        union_transiciones.add(union_trans);
-                    }
-                
-                // falta renombrar cada tuple<estado, estado> con un estado  
-                }
-                Set<State> new_estados = new HashSet<State>();
-                Set<State> new_estados_finales = new HashSet<State>();
-                int i = 0;
-                State newinitial = new State("s"+i);
-                new_estados.add(newinitial);
-                i++;
-                Set<Tuple<Tuple<State,State>,State>> estados_Guardados = new HashSet<Tuple<Tuple<State,State>,State>>(); 
-                estados_Guardados.add(new Tuple<Tuple<State,State>, State>(union_inicial, newinitial));
-               
-                if(union_est_finales.contains(union_inicial))
-                	new_estados_finales.add(newinitial);
-                
-                Set<Triple<State,Character,State>> transiciones_Guardadas = new HashSet<Triple<State,Character,State>>();
-                Iterator<Triple<Tuple<State, State>, Character, Tuple<State, State>>> uniontransiciones = union_transiciones.iterator();
-                
-                while(uniontransiciones.hasNext()){
-                  Triple<Tuple<State, State>, Character, Tuple<State, State>> transition_element = uniontransiciones.next();
-                  State newFromState = devolverGuardado(estados_Guardados, transition_element.first());  
-                  if(newFromState==null){
-                	  newFromState = new State("s"+i);
-                      new_estados.add(newFromState);
-                      i++;
-                      estados_Guardados.add(new Tuple<Tuple<State,State>, State>(transition_element.first(),newFromState));
-                  }
-                  if(new_estados_finales.contains(transition_element.first()))
-                	  new_estados_finales.add(newFromState);
-                  
-                  State newToState = devolverGuardado(estados_Guardados, transition_element.third());
-                  if(newToState==null){
-                	  newToState = new State("s"+i);
-                      new_estados.add(newToState);
-                      i++;
-                      estados_Guardados.add(new Tuple<Tuple<State,State>, State>(transition_element.third(),newToState));
-                  }
-                  
-                  if(new_estados_finales.contains(transition_element.third()))
-                	  new_estados_finales.add(newFromState);
-                  
-                  Triple<State,Character,State> newTransition = new Triple<State, Character, State>(newFromState, transition_element.second(),  newToState);
-                  if(!transiciones_Guardadas.contains(newTransition)){
-                	  transiciones_Guardadas.add(newTransition);
-                  }
-                  
-                }
-                DFA dfa = new DFA(new_estados, union_alfabeto,transiciones_Guardadas,newinitial,new_estados_finales);
-                return dfa;
+		// TODO	
+			//Union de los alfabetos
+			Set<Character> union_alfabeto = new HashSet<Character>();
+	        union_alfabeto.addAll(this.alfabeto);
+	        union_alfabeto.addAll(other.alfabeto);
+	        //Union de estados
+	        Set<State> union_estados = new HashSet<State>();
+	        union_estados.addAll(estados);
+	        //Union de transiciones
+	        Set<Triple<State,Character,State>> union_transitions = new HashSet<Triple<State,Character,State>>();
+	        union_transitions.addAll(transiciones);
+	        //Union de estados finales
+	        Set<State> union_finales = new HashSet<State>();
+	        union_finales.addAll(estados_finales);
+	        //Nuevo estado inicial
+			other.inicial.setName("?"+other.inicial.name().substring(1));
+	 
+			//renombrar estados del parametro
+	        Iterator<State> iterator = other.estados.iterator();
+	        while (iterator.hasNext()){
+	        	State corriente = iterator.next();
+	        	corriente.setName("?"+corriente.name().substring(1));
+	        }
+	        union_estados.addAll(other.states());
+	
+	        //renombrar transacciones del parametro
+	        Iterator<Triple<State, Character, State>> iterator_transiciones = other.transiciones.iterator();
+	        while (iterator_transiciones.hasNext()){
+	        	Triple<State, Character, State> transicion_corriente = iterator_transiciones.next();
+	        	transicion_corriente.first().setName("?"+transicion_corriente.first().name().substring(1));
+	        	transicion_corriente.third().setName("?"+transicion_corriente.third().name().substring(1));
+	        }
+	        union_transitions.addAll(other.transiciones);
+	        
+	        //renombrar estados finales del parametro
+	        Iterator<State> iterator_estados_finales = other.estados_finales.iterator();
+	        while (iterator_estados_finales.hasNext()){
+	        	State estado_final_corriente = iterator_estados_finales.next();
+	        	estado_final_corriente.setName("?"+estado_final_corriente.name().substring(1));
+	        }
+	        union_finales.addAll(other.estados_finales);
+	         
+	        //nuevo estado inicial "l0"
+	        State nuevo_inicial = new State("l0");
+	        //agregado la transaccion l0->q0 [label="Lambda"]; 
+	        //agregado la transaccion l0->?0 [label="Lambda"];       
+	        Triple<State, Character, State> aP = new Triple<State, Character, State>(nuevo_inicial, Lambda, other.inicial);
+	        Triple<State, Character, State> aQ = new Triple<State, Character, State>(nuevo_inicial, Lambda, inicial);
+	 
+	        union_transitions.add(aP);
+	        union_transitions.add(aQ);                
+	        //Nuevo NFALambda con las uniones y un nuevo estado inicial con dos transacciones lambda a los iniciales de los AFD
+	        NFALambda nfaLambda = new NFALambda(union_estados, union_alfabeto, union_transitions, nuevo_inicial, union_finales); 
+	        
+	        return nfaLambda.toDFA();
         }
 	
-	
-	public State devolverGuardado(Set<Tuple<Tuple<State,State>,State>> conjunto,Tuple<State,State> tupla){
-		State res = null;
-		Iterator<Tuple<Tuple<State, State>, State>> iterator = conjunto.iterator();
-        while(iterator.hasNext()){
-          Tuple<Tuple<State, State>, State> element = iterator.next();
-          if(element.first().equals(tupla))
-        	  return element.second();
-        }
-		return res;
-	}
 	/**
 	 * Returns a new automaton which recognizes the intersection of both
 	 * languages, the one accepted by 'this' and the one represented
@@ -438,7 +391,8 @@ public class DFA extends FA {
 		assert rep_ok();
 		assert other.rep_ok();
 		// TODO
-		return null;		
+		// Es el complemento de la union de los complementos de ambos DFA
+		return (complement().union(other.complement())).complement();		
 	}
    
 	@Override
@@ -487,4 +441,5 @@ public class DFA extends FA {
         }
         return true;
     }
+    
 }

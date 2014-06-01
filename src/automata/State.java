@@ -12,6 +12,9 @@ public class State {
 		return _name;
 	}
 
+	public void setName(String name){
+		_name = name;
+	}
 	// Optional - Use to get equality based in abtributes, 
 	// instead than by reference (which is Java's default). 
 	
