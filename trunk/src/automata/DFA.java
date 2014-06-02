@@ -42,7 +42,6 @@ public class DFA extends FA {
 	 *	State querying 
 	*/
 	
-	
 	@Override
 	public Set<State> states() {
                 //TODO
@@ -71,15 +70,15 @@ public class DFA extends FA {
 	public State delta(State from, Character c) {
 		assert states().contains(from);
 		assert alphabet().contains(c);
-                // TODO
-                assert !(transiciones.isEmpty());
-                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-                while (iterator.hasNext()){
-                    Triple<State,Character,State> element = iterator.next();
-                    if (element.first().name().equals(from.name()) && element.second().equals(c)){
-                        return element.third();
-                    }
-                }
+        // TODO
+	        assert !(transiciones.isEmpty());
+	        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+	        while (iterator.hasNext()){
+	            Triple<State,Character,State> element = iterator.next();
+	            if (element.first().name().equals(from.name()) && element.second().equals(c)){
+	                return element.third();
+	            }
+	        }
 		return null;
 	}
 	
@@ -209,30 +208,30 @@ public class DFA extends FA {
             return !res;
 	}
         
-       // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
-        private Set<State> sucesores(Set<State> estados, Set<Triple<State, Character, State>> transiciones){
-            Set<State> result = new HashSet<State>();
-            Iterator<Triple<State, Character, State>> iterator = transiciones.iterator();
-            while (iterator.hasNext()){
-                    Triple<State, Character, State> element = iterator.next();
-                    if(estados.contains(element.first())){
-                        result.add(element.third());
-                    }
-            }
-            return result;
-        }
-        
-        //funcion que cheque si un set contiene por lo menos un estado final
-        private boolean containFinal(Set<State> states, Set<State> finals){
-            Iterator<State> iterator = states.iterator();
-            while(iterator.hasNext()){
-                State element = iterator.next();
-                if(finals.contains(element)){
-                    return true;
+   // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
+    private Set<State> sucesores(Set<State> estados, Set<Triple<State, Character, State>> transiciones){
+        Set<State> result = new HashSet<State>();
+        Iterator<Triple<State, Character, State>> iterator = transiciones.iterator();
+        while (iterator.hasNext()){
+                Triple<State, Character, State> element = iterator.next();
+                if(estados.contains(element.first())){
+                    result.add(element.third());
                 }
-            }
-            return false;
         }
+        return result;
+    }
+        
+    //funcion que cheque si un set contiene por lo menos un estado final
+    private boolean containFinal(Set<State> states, Set<State> finals){
+        Iterator<State> iterator = states.iterator();
+        while(iterator.hasNext()){
+            State element = iterator.next();
+            if(finals.contains(element)){
+                return true;
+            }
+        }
+        return false;
+    }
         
 	/**
 	 * Checks the automaton for language infinity.
@@ -241,19 +240,49 @@ public class DFA extends FA {
 	 */
 	public boolean is_finite() {
             assert rep_ok();
-            Set<State> visitados = new HashSet<State>();
-            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-            while(iterator.hasNext()){
-                Triple<State,Character,State> element = iterator.next();
-                if(!visitados.contains(element.third())){
-                    visitados.add(element.first());
-                }else{
-                    return false;
-                }
+            boolean resp = true;
+            
+            //Veo si los sucesores de un estado contiene a dicho estado            
+            Iterator<State> iteratorState = estados.iterator();
+            while(iteratorState.hasNext()){
+                Set<State> visitados = new HashSet<State>();
+            	State currentState = iteratorState.next();
+            	visitados.add(currentState);
+            	if (sucesoresContineEstado(visitados,currentState)){
+            		resp = false;
+            		break;
+            	}
             }
-            return true; 
+            return resp; 
 	}
-	
+		
+	public boolean sucesoresContineEstado(Set<State> visitados, State estado){
+		boolean resp = false;
+		Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+        while(iterator.hasNext()){
+            Triple<State,Character,State> element = iterator.next();
+            if(element.first().equals(estado)){
+            	if(element.third().equals(estado)){
+            		resp = false;
+            		break;
+            	}else{
+            		visitados.add(estado);
+            		if(!visitados.contains(element.third())){
+            			visitados.add(element.third());
+            			if(sucesoresContineEstado(visitados,element.third())){
+            				resp = true;
+            				break;
+            			}
+            		}else{
+            			resp = true;
+            			break;
+            		}    			
+            	}
+        	}
+		}
+        
+        return resp;
+	}
 	/**
 	 * Returns a new automaton which recognizes the complementary
 	 * language. 
