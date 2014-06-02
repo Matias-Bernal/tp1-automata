@@ -176,7 +176,7 @@ public class DFA extends FA {
 		if(estados_finales.contains(inicial)){
                 return false;
             }
-            if(estados.isEmpty() || inicial==null || transiciones.isEmpty()){
+            if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || estados_finales.isEmpty()){
                 return true;
             }
             
@@ -274,28 +274,49 @@ public class DFA extends FA {
                         new_est_final.add(element);
                     }
                 }
-                // agrego el estado trampa a los estados y a lo hago estado final
+                // estado trampa
                 State estado_Trampa = new State("t0");
                 new_estados.addAll(estados);
-                new_estados.add(estado_Trampa);
-                new_est_final.add(estado_Trampa);
+                
                 //agrego todas las transiciones al estado trampa que hacen falta para que sea completo
                 new_transiciones.addAll(transiciones);
-                Iterator<Character> iterator_alfabeto = alfabeto.iterator();
-                while(iterator_alfabeto.hasNext()){
-                    Character element_alfabeto = iterator_alfabeto.next();
-                    //agrego las transiciones que no estan al estado trampa
-                    Iterator<Triple<State,Character,State>> iterator_transiciones = transiciones.iterator();
-                    while(iterator_transiciones.hasNext()){
-                        Triple<State,Character,State> element_transiciones = iterator_transiciones.next();
-                        if (delta(element_transiciones.first(),element_alfabeto)== null){
-                            Triple<State,Character,State> new_trans_trampa = new Triple<State,Character,State>(element_transiciones.first(),element_alfabeto,estado_Trampa);
+
+                //agrego las transiciones que no estan al estado trampa
+                
+                Iterator<State> iteratorEstados = estados.iterator();
+                boolean haytrampa = false;
+                
+                while(iteratorEstados.hasNext()){
+                    State elementEstado = iteratorEstados.next();
+                    Iterator<Character> iterator_alfabeto = alfabeto.iterator();
+                    while(iterator_alfabeto.hasNext()){
+                    	Character element_alfabeto = iterator_alfabeto.next();
+                    	Iterator<Triple<State,Character,State>> iterator_transiciones = transiciones.iterator();
+                        boolean agregar = true;
+                    	while(iterator_transiciones.hasNext()){             	
+                            Triple<State,Character,State> element_transiciones = iterator_transiciones.next();
+                            if(element_transiciones.first().equals(elementEstado) && element_transiciones.second().equals(element_alfabeto)){
+                            	agregar = false;
+                            	break;
+                            }
+                    	}
+                    	if(agregar){
+                    		haytrampa = true;
+                    		Triple<State,Character,State> new_trans_trampa = new Triple<State,Character,State>(elementEstado,element_alfabeto,estado_Trampa);
                             new_transiciones.add(new_trans_trampa);
-                        }
+                    	}
                     }
-                    // agrego la transicion a si mismo para cualquier letra del alfabeto
-                    Triple<State,Character,State> new_trans_trampa = new Triple<State,Character,State>(estado_Trampa,element_alfabeto,estado_Trampa);
-                    new_transiciones.add(new_trans_trampa);
+                }
+                if(haytrampa){
+                    new_estados.add(estado_Trampa);
+                    new_est_final.add(estado_Trampa);
+	                Iterator<Character> iterator_alfabeto = alfabeto.iterator();
+	                while(iterator_alfabeto.hasNext()){
+	                	Character element_alfabeto = iterator_alfabeto.next();
+	                	// agrego la transicion a si mismo para cualquier letra del alfabeto
+	                	Triple<State,Character,State> new_trans_trampa = new Triple<State,Character,State>(estado_Trampa,element_alfabeto,estado_Trampa);
+	                	new_transiciones.add(new_trans_trampa);                	
+	                }
                 }
                 DFA complemento = new DFA(new_estados, alfabeto, new_transiciones, inicial, new_est_final);
                 return complemento;		
