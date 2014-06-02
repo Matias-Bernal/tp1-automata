@@ -359,8 +359,16 @@ public class DFA extends FA {
 	 */
 	public DFA star() {
 		assert rep_ok();
-		// TODO
-		return null;		
+        Iterator<State> iterator_estados_finales = estados_finales.iterator();
+        Set<Triple<State,Character,State>> new_transitions = new HashSet<Triple<State,Character,State>>();
+        new_transitions.addAll(transiciones);
+        while (iterator_estados_finales.hasNext()){
+        	State current_final = iterator_estados_finales.next();
+        	Triple<State,Character,State> new_transition = new Triple<State, Character, State>(current_final, FA.Lambda, inicial);
+        	new_transitions.add(new_transition);
+        }
+        NFALambda nfalambda = new NFALambda(estados, alfabeto, new_transitions, inicial, estados_finales);
+		return nfalambda.toDFA();
 	}
 	
 	/**
