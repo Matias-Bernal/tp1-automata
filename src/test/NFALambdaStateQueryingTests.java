@@ -80,6 +80,8 @@ public class NFALambdaStateQueryingTests {
 		Set<Character> _set = new HashSet<Character>();
 		_set.add('a');
 		_set.add('b');
+		//Se agrago esta linea para porque las condiciones del test eran excluyentes 
+		_set.add(FA.Lambda);
 		assertTrue(dummy_nfa.alphabet().equals(_set));
 		assertTrue(dummy_nfa.alphabet().contains(FA.Lambda));
 	}	
