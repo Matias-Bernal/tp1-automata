@@ -187,7 +187,13 @@ public class NFA extends FA {
 	public DFA toDFA() {
 		assert rep_ok();
 		// TODO                
-		return null;
+        Triple<State,Character,State> trasition = new Triple<State, Character, State>(inicial, FA.Lambda, inicial);
+        Set<Triple<State,Character,State>> trasitions = new HashSet<Triple<State,Character,State>>();
+        trasitions.addAll(transiciones);
+        trasitions.add(trasition);
+        NFALambda nfalambda = new NFALambda(estados, alfabeto, trasitions, inicial, estados_finales);
+		
+		return nfalambda.toDFA();
 	}
 
 
