@@ -151,33 +151,33 @@ public class NFA extends FA {
 				}
 	}
         
-        public Set<State> deltaSet(Set<State> from, Character c) {
-            assert states().containsAll(from);
-            assert alphabet().contains(c);
-            // TODO
-            assert !(transiciones.isEmpty());
-            Set<State> result = new HashSet<State>();
-            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-            while (iterator.hasNext()){
-                Triple<State,Character,State> element = iterator.next();
-                if (from.contains(element.first()) && element.second().equals(c)){
-                    result.add(element.third());
-                }
+    public Set<State> deltaSet(Set<State> from, Character c) {
+        assert states().containsAll(from);
+        assert alphabet().contains(c);
+        // TODO
+        assert !(transiciones.isEmpty());
+        Set<State> result = new HashSet<State>();
+        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+        while (iterator.hasNext()){
+            Triple<State,Character,State> element = iterator.next();
+            if (from.contains(element.first()) && element.second().equals(c)){
+                result.add(element.third());
             }
-            return result;	
+        }
+        return result;	
 	}
         
-        //funcion que cheque si un set contiene por lo menos un estado final
-        private boolean containFinal(Set<State> states, Set<State> finals){
-            Iterator<State> iterator = states.iterator();
-            while(iterator.hasNext()){
-                State element = iterator.next();
-                if(finals.contains(element)){
-                    return true;
-                }
+    //funcion que cheque si un set contiene por lo menos un estado final
+    private boolean containFinal(Set<State> states, Set<State> finals){
+        Iterator<State> iterator = states.iterator();
+        while(iterator.hasNext()){
+            State element = iterator.next();
+            if(finals.contains(element)){
+                return true;
             }
-            return false;
         }
+        return false;
+    }
     
 	/**
 	 * Converts the automaton to a DFA.
@@ -191,6 +191,7 @@ public class NFA extends FA {
 	}
 
 
+	
 	@Override
 	public boolean rep_ok() {
 		// TODO: Check that the alphabet does not contains lambda.
