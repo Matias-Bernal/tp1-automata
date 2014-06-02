@@ -123,8 +123,14 @@ public class NFALambda extends FA {
 		assert verify_string(string);
 		// TODO
 		if(string==""){
-			Set<State> finales = delta(inicial, FA.Lambda);
-			return finales.contains(inicial);
+			Set<State> sucInitial = delta(inicial, FA.Lambda);
+			Iterator<State> iteratorfinal = estados_finales.iterator();
+			while (iteratorfinal.hasNext()){
+				State final_state = iteratorfinal.next();
+				if(sucInitial.contains(final_state))
+					return true;
+			}
+			return false;
 		}else{
             Set<State> sucesor1 = new HashSet<State>();
             sucesor1.addAll(delta(inicial,string.charAt(0)));
@@ -135,19 +141,34 @@ public class NFALambda extends FA {
             int i = 1;
             while(i < string.length()){
                 if ((i%2) != 0){
-                    sucesor2.addAll(deltaSet(sucesor1, string.charAt(i)));
-                    sucesor1.clear();
-                    if(sucesor2.isEmpty()){
-                        return false;
+                	Tuple<Boolean,Set<State>> new_sucesor = deltaSet(sucesor1, string.charAt(i));
+                    if(!new_sucesor.first()){
+	                	sucesor2.addAll(new_sucesor.second()); //falta chequear el lambda
+	                    sucesor1.clear();
+	                    if(sucesor2.isEmpty()){
+	                        return false;
+	                    }
+	                    i++;
+                    }else{
+	                    sucesor1.clear();
+                    	sucesor1.addAll(new_sucesor.second());
+                    	sucesor2.clear();
                     }
                 }else{
-                    sucesor1.addAll(deltaSet(sucesor2, string.charAt(i))); 
-                    sucesor2.clear();
-                    if(sucesor1.isEmpty()){
-                        return false;
+                	Tuple<Boolean,Set<State>> new_sucesor = deltaSet(sucesor2, string.charAt(i));
+                    if(!new_sucesor.first()){
+	                    sucesor1.addAll(new_sucesor.second()); 
+	                    sucesor2.clear();
+	                    if(sucesor1.isEmpty()){
+	                        return false;
+	                    }
+	                    i++;
+                    }else{
+	                    sucesor2.clear();
+                    	sucesor2.addAll(new_sucesor.second());
+                    	sucesor1.clear();
                     }
                 }
-                i++;
             }
             if (sucesor1.isEmpty()){
                 return containFinal(sucesor2, estados_finales);
@@ -157,23 +178,26 @@ public class NFALambda extends FA {
 		}
 	}
 	
-   public Set<State> deltaSet(Set<State> from, Character c) {
+   public Tuple<Boolean,Set<State>> deltaSet(Set<State> from, Character c) {
         assert states().containsAll(from);
         assert alphabet().contains(c);
         // TODO
         assert !(transiciones.isEmpty());
+        boolean res = false;
         Set<State> result = new HashSet<State>();
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
         while (iterator.hasNext()){
             Triple<State,Character,State> element = iterator.next();
-            if (from.contains(element.first()) && element.second().equals(c)){
-                result.add(element.third());
+            if ((from.contains(element.first()) && element.second().equals(c)) || (from.contains(element.first()) && element.second().equals(FA.Lambda))){
+                if(from.contains(element.first()) && element.second().equals(FA.Lambda))
+                	res = true;
+            	result.add(element.third());
             }
         }
-        return result;	
+        return new Tuple<Boolean, Set<State>>(res, result);	
 	}
         
-    //funcion que cheque si un set contiene por lo menos un estado final
+    //funcion que chequea si un set contiene por lo menos un estado final
     private boolean containFinal(Set<State> states, Set<State> finals){
         Iterator<State> iterator = states.iterator();
         while(iterator.hasNext()){
