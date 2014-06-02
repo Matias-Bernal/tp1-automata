@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import utils.Triple;
+import utils.Tuple;
 
 public class NFALambda extends FA {
 	
@@ -176,11 +177,7 @@ public class NFALambda extends FA {
 	*/
 	public DFA toDFA() {
 		assert rep_ok();
-		// TODO
-		Set<State> estadosDFA = new HashSet<State>();
-		Set<Triple<State,Character,State>> transicionesDFA = new HashSet<Triple<State,Character,State>>();
-		Set<State> estados_finalesDFA = new HashSet<State>();
-		
+		// TODO		
 		//ALGORITMO DE NFALambda a DFA//
 		Set<Triple<Set<State>,Character,Set<State>>> T = new HashSet<Triple<Set<State>,Character,Set<State>>>();
 		//Calcular Cerradura-lambda (0) = Estado A; 
@@ -190,30 +187,121 @@ public class NFALambda extends FA {
 		// Incluír A en NuevosEstados; 
 		Set<Set<State>> NuevosEstados = new HashSet<Set<State>>();
 		NuevosEstados.add(A);
+		Set<Set<State>> NuevosEstadosFinales = new HashSet<Set<State>>();
+		Iterator<State> iteratorFianales = estados_finales.iterator();
+		while (iteratorFianales.hasNext()){
+			State estadofinal = iteratorFianales.next();
+			if(A.contains(estadofinal)){
+				NuevosEstadosFinales.add(A);
+				break;
+			}
+		}
 		// WHILE no están todos los W de NuevosEstados marcados DO BEGIN 
 		Set<Set<State>> EstadosMarcados = new HashSet<Set<State>>();
 		while(!todosMarcados(NuevosEstados,EstadosMarcados)){
 			//Marcar W; 
-			Set<State> W = marcarEstado(NuevosEstados, EstadosMarcados);
+			Set<State> W = new HashSet<State>(); 
+			Iterator<Set<State>> iteratorNuevosEstados = NuevosEstados.iterator();
+			while (iteratorNuevosEstados.hasNext()){
+				Set<State> elemenNuevoEstado = iteratorNuevosEstados.next();
+				if(!EstadosMarcados.contains(elemenNuevoEstado)){
+					W = elemenNuevoEstado;
+					EstadosMarcados.add(W);
+					break;
+				}
+			}
 			//FOR cada ai pertence Te DO BEGIN
 			Iterator<Character> iteratorAlfabeto = alfabeto.iterator();
 			while (iteratorAlfabeto.hasNext()){
 				Character a = iteratorAlfabeto.next();
-				//X = Cerradura-lambda (Mueve (W, ai)); 
-				Set<State> X = clausura_lambda(mover(W, a));
-				// IF X no está en el conjunto NuevosEstados añadirlo;
-				if(!perteneceNuevoEstados(NuevosEstados, X)){
-					NuevosEstados.add(X);
+				if(!a.equals(FA.Lambda)){
+					//X = Cerradura-lambda (Mueve (W, ai));
+					Set<State> X = new HashSet<State>();
+					X = clausura_lambda(mover(W, a));
+					// IF X no está en el conjunto NuevosEstados añadirlo;
+					if(!perteneceNuevoEstados(NuevosEstados, X) && !X.isEmpty()){
+						NuevosEstados.add(X);
+					}
+					//Transición [W, a] = X;
+					if(!X.isEmpty()){
+						T.add(new Triple<Set<State>, Character, Set<State>>(W, a, X));
+						Iterator<State> iteratorFianalesX = estados_finales.iterator();
+						while (iteratorFianalesX.hasNext()){
+							State estadofinal = iteratorFianalesX.next();
+							if(X.contains(estadofinal) && !NuevosEstadosFinales.contains(X)){
+								NuevosEstadosFinales.add(X);
+								break;
+							}
+						}
+					}
 				}
-				//Transición [W, a] = X;
-				T.add(new Triple<Set<State>, Character, Set<State>>(W, a, X));
 			}
 		}
 
+		// falta renombrar cada tuple<estado, estado> con un estado  
+	    Set<State> new_estados = new HashSet<State>();
+	    Set<State> new_estados_finales = new HashSet<State>();
+	    int i = 0;
+	    State newinitial = new State("p"+i);
+	    new_estados.add(newinitial);
+	    i++;
+	    Set<Tuple<Set<State>,State>> estados_Guardados = new HashSet<Tuple<Set<State>,State>>(); 
+	    estados_Guardados.add(new Tuple<Set<State>, State>(inicialDFALambda, newinitial));
+   
+	    if(NuevosEstadosFinales.contains(inicialDFALambda))
+            new_estados_finales.add(newinitial);
+    
+	    Set<Triple<State,Character,State>> transiciones_Guardadas = new HashSet<Triple<State,Character,State>>();
+	    Iterator<Triple<Set<State>, Character, Set<State>>> iteratorT = T.iterator();
+    
+	    while(iteratorT.hasNext()){
+	    	Triple<Set<State>, Character, Set<State>> transition_element = iteratorT.next();
+	    	State newFromState = devolverGuardado(estados_Guardados, transition_element.first());  
+	    	if(newFromState==null){
+              newFromState = new State("p"+i);
+              new_estados.add(newFromState);
+              i++;
+              estados_Guardados.add(new Tuple<Set<State>, State>(transition_element.first(),newFromState));
+	    	}
+	    	if(NuevosEstadosFinales.contains(transition_element.first()) && !new_estados_finales.contains(newFromState))
+              new_estados_finales.add(newFromState);
+      
+	    	State newToState = devolverGuardado(estados_Guardados, transition_element.third());
+	    	if(newToState==null){
+	    		newToState = new State("p"+i);
+	    		new_estados.add(newToState);
+	    		i++;
+	    		estados_Guardados.add(new Tuple<Set<State>, State>(transition_element.third(),newToState));
+	    	}
+      
+	    	if(NuevosEstadosFinales.contains(transition_element.third()) && !new_estados_finales.contains(newToState))
+	    		new_estados_finales.add(newToState);
+      
+	    	Triple<State,Character,State> newTransition = new Triple<State, Character, State>(newFromState, transition_element.second(),  newToState);
+	    	if(!transiciones_Guardadas.contains(newTransition)){
+	    		transiciones_Guardadas.add(newTransition);
+	    	}
+      
+	    }
+    
+	    Set<Character> nuevo_alfabeto = new HashSet<Character>();
+	    nuevo_alfabeto = alfabeto;
+	    nuevo_alfabeto.remove(FA.Lambda);
+	    DFA dfa = new DFA(new_estados, nuevo_alfabeto,transiciones_Guardadas,newinitial,new_estados_finales);	
 		// FIN //
-		
-		DFA dfaAutomata = new DFA(estadosDFA, alfabeto, transicionesDFA, inicial, estados_finalesDFA);
-		return dfaAutomata;
+			
+		return dfa;
+	}
+	
+    public State devolverGuardado(Set<Tuple<Set<State>,State>> conjunto,Set<State> estado){
+        State res = null;
+        Iterator<Tuple<Set<State>, State>> iterator = conjunto.iterator();
+		while(iterator.hasNext()){
+		  Tuple<Set<State>, State> element = iterator.next();
+		  if(element.first().equals(estado))
+		          return element.second();
+		}
+	    return res;
 	}
 	
 	public boolean perteneceNuevoEstados(Set<Set<State>> NuevosEstados,Set<State> estado){

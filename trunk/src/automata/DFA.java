@@ -275,7 +275,7 @@ public class DFA extends FA {
                     }
                 }
                 // agrego el estado trampa a los estados y a lo hago estado final
-                State estado_Trampa = new State("trampa");
+                State estado_Trampa = new State("t0");
                 new_estados.addAll(estados);
                 new_estados.add(estado_Trampa);
                 new_est_final.add(estado_Trampa);
@@ -289,12 +289,12 @@ public class DFA extends FA {
                     while(iterator_transiciones.hasNext()){
                         Triple<State,Character,State> element_transiciones = iterator_transiciones.next();
                         if (delta(element_transiciones.first(),element_alfabeto)== null){
-                            Triple<State,Character,State> new_trans_trampa = new Triple<>(element_transiciones.first(),element_alfabeto,estado_Trampa);
+                            Triple<State,Character,State> new_trans_trampa = new Triple<State,Character,State>(element_transiciones.first(),element_alfabeto,estado_Trampa);
                             new_transiciones.add(new_trans_trampa);
                         }
                     }
                     // agrego la transicion a si mismo para cualquier letra del alfabeto
-                    Triple<State,Character,State> new_trans_trampa = new Triple<>(estado_Trampa,element_alfabeto,estado_Trampa);
+                    Triple<State,Character,State> new_trans_trampa = new Triple<State,Character,State>(estado_Trampa,element_alfabeto,estado_Trampa);
                     new_transiciones.add(new_trans_trampa);
                 }
                 DFA complemento = new DFA(new_estados, alfabeto, new_transiciones, inicial, new_est_final);
@@ -326,8 +326,8 @@ public class DFA extends FA {
 		// TODO	
 			//Union de los alfabetos
 			Set<Character> union_alfabeto = new HashSet<Character>();
-	        union_alfabeto.addAll(this.alfabeto);
-	        union_alfabeto.addAll(other.alfabeto);
+	        union_alfabeto.addAll(alphabet());
+	        union_alfabeto.addAll(other.alphabet());
 	        //Union de estados
 	        Set<State> union_estados = new HashSet<State>();
 	        union_estados.addAll(estados);
@@ -345,8 +345,8 @@ public class DFA extends FA {
 	        while (iterator.hasNext()){
 	        	State corriente = iterator.next();
 	        	corriente.setName("?"+corriente.name().substring(1));
+	        	union_estados.add(corriente);
 	        }
-	        union_estados.addAll(other.states());
 	
 	        //renombrar transacciones del parametro
 	        Iterator<Triple<State, Character, State>> iterator_transiciones = other.transiciones.iterator();
@@ -354,19 +354,20 @@ public class DFA extends FA {
 	        	Triple<State, Character, State> transicion_corriente = iterator_transiciones.next();
 	        	transicion_corriente.first().setName("?"+transicion_corriente.first().name().substring(1));
 	        	transicion_corriente.third().setName("?"+transicion_corriente.third().name().substring(1));
+	        	union_transitions.add(transicion_corriente);
 	        }
-	        union_transitions.addAll(other.transiciones);
 	        
 	        //renombrar estados finales del parametro
 	        Iterator<State> iterator_estados_finales = other.estados_finales.iterator();
 	        while (iterator_estados_finales.hasNext()){
 	        	State estado_final_corriente = iterator_estados_finales.next();
 	        	estado_final_corriente.setName("?"+estado_final_corriente.name().substring(1));
+	        	union_finales.add(estado_final_corriente);
 	        }
-	        union_finales.addAll(other.estados_finales);
 	         
 	        //nuevo estado inicial "l0"
 	        State nuevo_inicial = new State("l0");
+	        union_estados.add(nuevo_inicial);
 	        //agregado la transaccion l0->q0 [label="Lambda"]; 
 	        //agregado la transaccion l0->?0 [label="Lambda"];       
 	        Triple<State, Character, State> aP = new Triple<State, Character, State>(nuevo_inicial, Lambda, other.inicial);
@@ -377,7 +378,8 @@ public class DFA extends FA {
 	        //Nuevo NFALambda con las uniones y un nuevo estado inicial con dos transacciones lambda a los iniciales de los AFD
 	        NFALambda nfaLambda = new NFALambda(union_estados, union_alfabeto, union_transitions, nuevo_inicial, union_finales); 
 	        
-	        return nfaLambda.toDFA();
+	        DFA dfa = nfaLambda.toDFA();
+	        return dfa;
         }
 	
 	/**
