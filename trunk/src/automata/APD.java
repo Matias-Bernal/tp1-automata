@@ -1,10 +1,14 @@
 package automata;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -213,14 +217,180 @@ public class APD {
 	 *	State querying 
 	 */
 
+	public void to_dot(String file_name) {
+		assert rep_ok();
+		assert !(transiciones.isEmpty());
+		assert !(file_name==null || file_name.isEmpty());
+		File file = new File("src/test/"+file_name+".dot");
+		if(!file.exists()){			
+			String dot_graph = "digraph{\n"+
+	                           "inic[shape=point];\n"+
+	                           "inic->"+estado_inicial.name()+";\n";
+            Iterator<Quintuple<State, Character, String, Character, State>> iterator = transiciones.iterator();
+            while (iterator.hasNext()){
+                Quintuple<State, Character, String, Character, State> element = iterator.next();
+               dot_graph += element.first().name()+"->"+element.fifth().name()+" [label=\""+element.second().toString()+"\\"+element.fourth()+"\\"+element.third()+"\"];\n";
+            }
+            dot_graph += "\n";
+            Iterator<State> iteratorfinal = estados_finales.iterator();
+            while (iteratorfinal.hasNext()){
+                State element = iteratorfinal.next();
+                dot_graph += element.name()+"[shape=doublecircle];\n"; 
+            }
+            dot_graph += "}";
+            
+            try { 
+            	FileWriter fw = new FileWriter(file); 
+            	BufferedWriter bw = new BufferedWriter (fw); 
+            	PrintWriter writer = new PrintWriter (bw); 
+
+            	writer.println(dot_graph); 
+            	writer.close(); 
+            } catch (IOException e) { 
+            	System.out.println("El archivo no pudo ser escrito o la ruta no existe"); 
+            } 
+		}else{
+			System.out.println("El archivo ya existe");
+		}
+	}
 	
 	
+	public boolean accept_by_final_state(String string) {
+        assert rep_ok();
+        assert string != null;
+        assert verify_string(string);
+        if(string==""){
+			return estados_finales.contains(estado_inicial);
+		}else{
+            State state = delta(estado_inicial, string.charAt(0));
+            if (state == null) {return false;}
+            for(int i=1; i<string.length(); i++){
+                state = delta(state, string.charAt(i));
+                if (state == null) {return false;}
+            }
+            return estados_finales.contains(state);
+		}
+	}
+	
+	private State delta(State estado, Character caracter) {
+		assert estados.contains(estado);
+		assert alfabeto.contains(caracter);
+	    assert !(transiciones.isEmpty());
+	    Iterator<Quintuple<State, Character, String, Character, State>> iterator = transiciones.iterator();    
+	    while (iterator.hasNext()){
+	       Quintuple<State, Character, String, Character, State> element = iterator.next();
+	       if (element.first().name().equals(estado.name()) && element.second().equals(caracter) && pila.tope().toString().equals(element.fourth().toString())){
+	    	   String elemento = element.third();
+	    	   if(elemento.toString().equals(Lambda.toString())){
+	    		   pila.desapilar();
+	    	   }else{
+	    		   if(!pila.tope().equals(Simbolo_Inicial)){
+		    		   pila.desapilar();
+		    	   }
+	    		   if (elemento.length()==1){
+		    			   pila.apilar(elemento);//falta el caso "aa"   
+		    		   }else{
+		    			    for(int i=0;i<elemento.length();i++){
+		    			    	Character obj = elemento.charAt(i);
+		    			    	pila.apilar(obj);
+		    			    }
+		    		   }
+		    	   }
+	           return element.fifth();
+	       }
+	    }
+	    return null;
+	}
+
+	public boolean verify_string(String s) {
+		boolean res = true;
+		for(int i=0;i<s.length();i++){
+			if(!alfabeto.contains(s.charAt(i))){
+				res = false;
+				break;
+			}
+				
+		}
+		return res;
+	}
+
 	/**
 	 * @return True iff the automaton is in a consistent state.
 	 */
 	public boolean rep_ok() {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+
+	public Set<State> getEstados() {
+		return estados;
+	}
+
+
+	public void setEstados(Set<State> estados) {
+		this.estados = estados;
+	}
+
+
+	public Set<Character> getAlfabeto() {
+		return alfabeto;
+	}
+
+
+	public void setAlfabeto(Set<Character> alfabeto) {
+		this.alfabeto = alfabeto;
+	}
+
+
+	public Set<Character> getAlfabeto_pila() {
+		return alfabeto_pila;
+	}
+
+
+	public void setAlfabeto_pila(Set<Character> alfabeto_pila) {
+		this.alfabeto_pila = alfabeto_pila;
+	}
+
+
+	public Set<Quintuple<State, Character, String, Character, State>> getTransiciones() {
+		return transiciones;
+	}
+
+
+	public void setTransiciones(
+			Set<Quintuple<State, Character, String, Character, State>> transiciones) {
+		this.transiciones = transiciones;
+	}
+
+
+	public State getEstado_inicial() {
+		return estado_inicial;
+	}
+
+
+	public void setEstado_inicial(State estado_inicial) {
+		this.estado_inicial = estado_inicial;
+	}
+
+
+	public Set<State> getEstados_finales() {
+		return estados_finales;
+	}
+
+
+	public void setEstados_finales(Set<State> estados_finales) {
+		this.estados_finales = estados_finales;
+	}
+
+
+	public TadPilaDinPila getPila() {
+		return pila;
+	}
+
+
+	public void setPila(TadPilaDinPila pila) {
+		this.pila = pila;
 	}
 	
 }
