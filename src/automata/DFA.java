@@ -114,7 +114,7 @@ public class DFA extends FA {
 	
 	@Override
 	public boolean accepts(String string) {
-            assert rep_ok();
+        assert rep_ok();
 		assert string != null;
 		assert verify_string(string);
 		// TODO
