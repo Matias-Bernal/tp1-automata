@@ -503,7 +503,6 @@ public class DFA extends FA {
     
         
     public DFA minimizarDFA (DFA automat){
-        
         Triple min[][] = new Triple[this.estados.size()-1][this.estados.size()-1];
         
         State _estados[] = new State[this.estados.size()];
@@ -578,10 +577,11 @@ public class DFA extends FA {
                         }
                     }
                     DFA automata = new DFA(_state,this.alfabeto,_transitions,this.inicial, _state_final);
+                    automat = automata;
                 }
             }
         }
-        return automata;
+        return automat;
     }
     
     private boolean xor(boolean x, boolean y){
