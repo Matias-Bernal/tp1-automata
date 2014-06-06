@@ -21,6 +21,19 @@ public class Triple<A,B,C> {
 		_third = trd;
 	}
 	
+        //Seters
+        public void setFirst(A fst){ 
+		_first = fst;
+	}
+	
+	public void setSecond(B snd){ 
+		_second = snd;
+	}
+	
+	public  void setThird(C trd){ 
+		_third = trd;
+	}
+        
 	// Getters
 	
 	public A first() { 

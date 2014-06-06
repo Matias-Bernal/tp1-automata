@@ -3,7 +3,6 @@ package automata;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import utils.Triple;
 import utils.Tuple;
 
@@ -502,4 +501,121 @@ public class DFA extends FA {
         return true;
     }
     
+        
+    public DFA minimizarDFA (DFA automat){
+        
+        Triple min[][] = new Triple[this.estados.size()-1][this.estados.size()-1];
+        
+        State _estados[] = new State[this.estados.size()];
+        _estados = (State[]) this.estados.toArray();
+        
+        for(int i=0; i<min.length; i++){
+            for(int j=0; j<=i; j++){
+                if(xor(this.estados_finales.contains(_estados[i+1] ),this.estados_finales.contains(_estados[j]))){
+                    min[i][j] = new Triple(_estados[i+1], _estados[j],"x");
+                }else{
+                    min[i][j] = new Triple(_estados[i+1], _estados[j],"");
+                }           
+            }
+        }
+        boolean change = true;
+        boolean result = false;
+        while(change){
+            change = false;
+            for(int i=0; i<min.length; i++){
+                for(int j=0; j<=i; j++){
+                    if(min[i][j].third()==""){
+                        Iterator<Character> iterator_aphabet = alfabeto.iterator();
+                        while(!result || iterator_aphabet.hasNext()){
+                            Character _char = iterator_aphabet.next();
+                            result = deltaMin((State)min[i][j].first(),(State)min[i][j].second(),_char,min);
+                        }
+                        if(result){
+                            min[i][j].setThird("x");
+                            change = change||true;
+                        }else{
+                            change = change||false;
+                        }
+                    }
+                }
+            }
+        }
+        for(int i=0; i<min.length; i++){
+            for(int j=0; j<=i; j++){
+                if(min[i][j].third()==""){
+                    State _new = new State((((State)min[i][j].first()).name())+(((State)min[i][j].second()).name()));
+                    Set<Triple<State,Character,State>> _transitions = new HashSet<Triple<State,Character,State>>();
+                    _transitions.addAll(transiciones);
+                    Iterator <Triple<State,Character,State>> _trans = _transitions.iterator();
+                    while(_trans.hasNext()){
+                        Triple<State,Character,State> corriente = _trans.next();
+                        if(corriente.first().equals((((State)min[i][j].first()))) || (corriente.first().equals((((State)min[i][j].second()))))){
+                            corriente.setFirst(_new);
+                        }else if(corriente.third().equals((((State)min[i][j].first()))) || (corriente.third().equals((((State)min[i][j].second()))))){
+                            corriente.setThird(_new);
+                        }
+                    }
+                    
+                    Set<State> _state_final = new HashSet<State>();
+                    _state_final.addAll(this.estados_finales);
+                    Iterator <State> _state_fnl = _state_final.iterator();
+                    while(_state_fnl.hasNext()){
+                        State corriente = _state_fnl.next();
+                        if(corriente.equals(min[i][j].first()) || corriente.equals(min[i][j].second())){
+                            _state_final.remove(corriente);
+                            _state_final.add(_new);
+                        }
+                    }
+                    
+                    Set<State> _state = new HashSet<State>();
+                    _state.addAll(this.estados);
+                    Iterator <State> _st = _state.iterator();
+                    while(_st.hasNext()){
+                        State corriente = _st.next();
+                        if(corriente.equals(min[i][j].first()) || corriente.equals(min[i][j].second())){
+                            _state.remove(corriente);
+                            _state.add(_new);
+                        }
+                    }
+                    DFA automata = new DFA(_state,this.alfabeto,_transitions,this.inicial, _state_final);
+                }
+            }
+        }
+        return automata;
+    }
+    
+    private boolean xor(boolean x, boolean y){
+        return ( ( x || y ) && ! ( x && y ) );
+    }    
+
+    private boolean deltaMin(State estado_a, State estado_b, Character c, Triple[][] matriz){
+        State estado1 = delta(estado_a, c);
+        State estado2 = delta(estado_b, c);
+        int j = 0;
+        int i = 0;
+        while((i<matriz.length) && (matriz[i][j].first()!= estado1)){
+            i++;
+        }
+        
+        while(j<matriz.length && matriz[i][j]!=null && matriz[i][j].second() != estado2){
+            j++;
+        }
+        
+        if(j==matriz.length || matriz[i][j]==null){
+            i = 0;
+            j = 0;
+            while((i<matriz.length) && (matriz[i][j].first()!= estado2)){
+                i++;
+            }
+        
+            while(j<matriz.length && matriz[i][j]!=null && matriz[i][j].second() != estado1){
+                j++;
+            }
+        }
+        return matriz[i][j].third()=="x";
+    }
+    
+   
+    
 }
+
