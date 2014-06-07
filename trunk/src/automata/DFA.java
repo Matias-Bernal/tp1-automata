@@ -502,7 +502,8 @@ public class DFA extends FA {
     }
     
         
-    public DFA minimizarDFA (DFA automat){
+    public DFA minimizeDFA (DFA automat){
+        assert rep_ok();
         Triple min[][] = new Triple[this.estados.size()-1][this.estados.size()-1];
         
         State _estados[] = new State[this.estados.size()];
@@ -614,8 +615,100 @@ public class DFA extends FA {
         }
         return matriz[i][j].third()=="x";
     }
-    
+        
    
-    
+   public boolean equalsAutomat(DFA A, DFA B){
+       assert rep_ok();
+       assert A.rep_ok();
+       assert B.rep_ok();
+       
+       boolean equals = true;
+       
+       //El mismo alfabeto
+       Set<Character> alf_A = new HashSet<>();
+       alf_A.addAll(A.alfabeto);
+       Iterator<Character> alphabet_A = alf_A.iterator();
+       
+       Set<Character> alf_B = new HashSet<>();
+       alf_B.addAll(B.alfabeto);
+       Iterator<Character> alphabet_B = alf_B.iterator();
+       
+       while(alphabet_A.hasNext() && alphabet_B.hasNext() && equals){
+           Character current_A = alphabet_A.next();
+           Character current_B = alphabet_B.next();
+           if(!current_A.equals(current_B)){
+               equals = false;
+           }
+       }
+       
+       //Los mismos estados
+       Set<State> st_A = new HashSet<>();
+       st_A.addAll(A.estados);
+       Iterator<State> state_A = st_A.iterator();
+       
+       Set<State> st_B = new HashSet<>();
+       st_B.addAll(B.estados);
+       Iterator<State> state_B = st_B.iterator();
+       
+       while(state_A.hasNext() && state_B.hasNext() && equals){
+           State current_A = state_A.next();
+           State current_B = state_B.next();
+           if(!current_A.equals(current_B)){
+               equals = false;
+           }
+       }
+       
+       //El mismo numero de transiciones y si las transiciones son las mismas
+       Set<Triple<State,Character,State>> transit_A = new HashSet<>();
+       transit_A.addAll(A.transiciones);
+       Iterator<Triple<State,Character,State>> transitions_A = transit_A.iterator();
+       
+       Set<Triple<State,Character,State>> transit_B = new HashSet<>();
+       transit_B.addAll(B.transiciones);
+       Iterator<Triple<State,Character,State>> transitions_B = transit_B.iterator();
+       if(!transit_A.containsAll(transit_B)){
+           equals = false;
+       }
+       while(transitions_A.hasNext() && transitions_B.hasNext() && equals){
+            Triple<State,Character,State> current_A = transitions_A.next();
+            Triple<State,Character,State> current_B = transitions_B.next();
+            if(!current_A.equals(current_B)){
+                equals = false;
+            }
+       }
+       
+       //Los mismos estados finales
+       Set<State> st_final_A = new HashSet<>();
+       st_final_A.addAll(A.estados_finales);
+       Iterator<State> state_final_A = st_final_A.iterator();
+       
+       Set<State> st_final_B = new HashSet<>();
+       st_final_B.addAll(B.estados_finales);
+       Iterator<State> state_final_B = st_final_B.iterator();
+       
+       while(state_final_A.hasNext() && state_final_B.hasNext() && equals){
+           State current_A = state_final_A.next();
+           State current_B = state_final_B.next();
+           if(!current_A.equals(current_B)){
+               equals = false;
+           }
+       }
+       
+       //El mismo estado inicial
+       
+       if(A.inicial.equals(B.inicial)){
+           equals = false;
+       }
+       
+       return equals;
+    }
+   
+    //Lee la entrada estándar o una lista de archivos e 
+    //imprime las líneas que contengan coincidencias para la expresión regular. 
+    public String grep(){
+        assert rep_ok();
+        return ;
+    }
+  
 }
 
