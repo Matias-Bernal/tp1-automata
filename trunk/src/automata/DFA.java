@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import utils.Triple;
 import utils.Tuple;
 
@@ -769,28 +767,37 @@ public class DFA extends FA {
         assert (regular_exp != null);
         assert (path_file != null);
         
-        //new ER expresion regular
-        //AFD automata = ER.toDFA()
+        //Con la expresion regular construyo el automata
+        DFA automata = regular_exp.toDFA();
         
-        String res = "";
-        
+        String result = "";
+       
         File file = new File (path_file);
 	FileReader fr = new FileReader (file);
 	BufferedReader br = new BufferedReader(fr);
-        //Con la exprecion regular construyo el automata
+        
         String line = br.readLine();
-        while(br!= null){
-            
-            String line = br.readLine();
+        LinkedList<String> sub_String = new LinkedList();
+        sub_String = sub_List(line);
+        while(line != null){
+            if(automata.accepts(line)){
+                result += line +"/n";
+            }
+            line = br.readLine();
+            sub_String = sub_List(line);
         }
-        //Expresión regular
-        if(){
-            
-        }else if(){ //Lista de archivos
-            
-        }
-        return ;
+        return result;
     }
-  
+    
+    
+    private LinkedList<String> sub_List(String text){
+        LinkedList<String> list = new LinkedList();
+        for(int i = 0; i < text.length(); i++){
+            for(int j = i; j < text.length(); j++){
+                list.add(text.substring(i, j));
+            }
+        }
+        return list;
+    }
+    
 }
-
