@@ -1,5 +1,9 @@
 package automata;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -507,7 +511,7 @@ public class DFA extends FA {
         Triple min[][] = new Triple[this.estados.size()-1][this.estados.size()-1];
         
         State _estados[] = new State[this.estados.size()];
-        _estados = (State[]) this.estados.toArray();
+        _estados = to_Array(this.estados);
         
         for(int i=0; i<min.length; i++){
             for(int j=0; j<=i; j++){
@@ -583,6 +587,18 @@ public class DFA extends FA {
             }
         }
         return automat;
+    }
+    
+    private State[] to_Array(Set<State> state){
+        
+        Iterator <State> _st = state.iterator();
+        State array_state[] = new State[state.size()];
+        int i = 0;
+        while(_st.hasNext()){
+            array_state[i] = _st.next();
+            i++;
+        }
+            return array_state;
     }
     
     private boolean xor(boolean x, boolean y){
@@ -672,7 +688,7 @@ public class DFA extends FA {
        while(transitions_A.hasNext() && transitions_B.hasNext() && equals){
             Triple<State,Character,State> current_A = transitions_A.next();
             Triple<State,Character,State> current_B = transitions_B.next();
-            if(!current_A.equals(current_B)){
+            if(!(current_A.equals(current_B) && current_A.second().equals(current_B.second()))){
                 equals = false;
             }
        }
@@ -705,21 +721,32 @@ public class DFA extends FA {
    
     //Lee la entrada estándar o una lista de archivos e 
     //imprime las líneas que contengan coincidencias para la expresión regular. 
-    public String grep(){
+    public String grep(String regular_exp, String path_file) throws IOException{
         assert rep_ok();
-        return null;
-    }
-    
-    
-    public Set<Triple<State,Character,State>> getTransiciones(){
-    	return transiciones;
-    }
-    
-    public void setTransiciones(Set<Triple<State,Character,State>> transiciones) throws IllegalArgumentException{
-    	this.transiciones = transiciones;
-    	if(!rep_ok()){
-			throw new IllegalArgumentException();		
-		}
+        assert (regular_exp != null);
+        assert (path_file != null);
+        
+        //new ER expresion regular
+        //AFD automata = ER.toDFA()
+        
+        String res = "";
+        
+        File file = new File (path_file);
+	FileReader fr = new FileReader (file);
+	BufferedReader br = new BufferedReader(fr);
+        //Con la exprecion regular construyo el automata
+        String line = br.readLine();
+        while(br!= null){
+            
+            String line = br.readLine();
+        }
+        //Expresión regular
+        if(){
+            
+        }else if(){ //Lista de archivos
+            
+        }
+        return ;
     }
   
 }
