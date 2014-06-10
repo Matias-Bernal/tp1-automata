@@ -563,11 +563,16 @@ public class DFA extends FA {
     //funcion que retorna la minimizacion del automata corriente   
     public DFA minimizeDFA (DFA automat){
         assert rep_ok();
+        //creo la tabla de estados equivalentes en el cual en el primer elemento tengo la fila, 
+        //en el segundo la columna y en el tercero si son equivalentes los estados
         Triple min[][] = new Triple[this.estados.size()-1][this.estados.size()-1];
         
+        //paso del set de estados a un arreglo de estados para mayor manejo
         State _estados[] = new State[this.estados.size()];
         _estados = to_Array(this.estados);
         
+        //lleno la tabla con la fila y la columna, y agrego una "x" si en la fila o columna existe un estado final
+        // si son los dos finales(fila y columna) lo dejo con vacio
         for(int i=0; i<min.length; i++){
             for(int j=0; j<=i; j++){
                 if(xor(this.estados_finales.contains(_estados[i+1] ),this.estados_finales.contains(_estados[j]))){
@@ -577,33 +582,51 @@ public class DFA extends FA {
                 }           
             }
         }
+        
+        //empieza el algoritmo de llenado de la tabla
         boolean change = true;
         boolean result = false;
+        //ciclo hasta que en la tabla no se produzcan cambios 
         while(change){
             change = false;
+            //recorre todas las filas
             for(int i=0; i<min.length; i++){
+                //recorre todas las columnas
                 for(int j=0; j<=i; j++){
+                    //comprueba si en una interseccion existe un espacio en blanco como tercera componente
                     if(min[i][j].third()==""){
+                        //busca la interseccion de todo los estados siguientes con todo el alfabeto
                         Iterator<Character> iterator_aphabet = alfabeto.iterator();
                         while(!result || iterator_aphabet.hasNext()){
                             Character _char = iterator_aphabet.next();
                             result = deltaMin((State)min[i][j].first(),(State)min[i][j].second(),_char,min);
                         }
+                        //si alguno de esas intersecciones posee una x
                         if(result){
+                            //cambia la tercera componente de la interseccion por una x
                             min[i][j].setThird("x");
-                            change = change||true;
-                        }else{
-                            change = change||false;
+                            change = true;
                         }
                     }
                 }
             }
         }
+        
+        // empieza la creacion del automata a partir de la tabla de estados equivalentes
+        Set<Triple<State,Character,State>> _transitions = new HashSet<Triple<State,Character,State>>();
+        Set<State> _state_final = new HashSet<State>();
+        Set<State> _state = new HashSet<State>();
+        //recorro todas las filas
         for(int i=0; i<min.length; i++){
+            //recorro todas las columnas
             for(int j=0; j<=i; j++){
+                //si encuentro una interseccion con la tercera componente vacia entonces debo unir los estados y renombrar
+                //todas las apariciones de los estado de la interseccion por el estado que contiene a los dos estados
                 if(min[i][j].third()==""){
+                    //creo el nuevo estado que contendra el nombre de ambos
                     State _new = new State((((State)min[i][j].first()).name())+(((State)min[i][j].second()).name()));
-                    Set<Triple<State,Character,State>> _transitions = new HashSet<Triple<State,Character,State>>();
+                    
+                    //empiezo a renombrar las apariciones de los estados en las transiciones
                     _transitions.addAll(transiciones);
                     Iterator <Triple<State,Character,State>> _trans = _transitions.iterator();
                     while(_trans.hasNext()){
@@ -615,7 +638,7 @@ public class DFA extends FA {
                         }
                     }
                     
-                    Set<State> _state_final = new HashSet<State>();
+                    //renombro las apariciones de los estados en los estados finales
                     _state_final.addAll(this.estados_finales);
                     Iterator <State> _state_fnl = _state_final.iterator();
                     while(_state_fnl.hasNext()){
@@ -626,7 +649,7 @@ public class DFA extends FA {
                         }
                     }
                     
-                    Set<State> _state = new HashSet<State>();
+                    //renombro las apariciones de los estados en el set de estados
                     _state.addAll(this.estados);
                     Iterator <State> _st = _state.iterator();
                     while(_st.hasNext()){
@@ -636,12 +659,12 @@ public class DFA extends FA {
                             _state.add(_new);
                         }
                     }
-                    DFA automata = new DFA(_state,this.alfabeto,_transitions,this.inicial, _state_final);
-                    automat = automata;
                 }
             }
         }
-        return automat;
+        //creo el automata resultante de la minimizacion
+        DFA automata = new DFA(_state,this.alfabeto,_transitions,this.inicial, _state_final);
+        return automata;
     }
     
     //funcion que pasa de un set de estados a un arreglo de estados
@@ -662,34 +685,41 @@ public class DFA extends FA {
         return ( ( x || y ) && ! ( x && y ) );
     }    
 
+    //obtiene el siguiente de estado_a y de estado_b con el caracter c y despues busca en la matriz la interseccion de esos dos estados siguientes 
+    //y se fija si hay una x si no hay entonces la interseccion estado_a y estado _b queda igual, si hay se le pone una x.
     private boolean deltaMin(State estado_a, State estado_b, Character c, Triple[][] matriz){
         State estado1 = delta(estado_a, c);
         State estado2 = delta(estado_b, c);
         int j = 0;
         int i = 0;
+        
+        //recorro las filas en busca de la fila estado1
         while((i<matriz.length) && (matriz[i][j].first()!= estado1)){
             i++;
         }
-        
+        //una vez que ya encontre la fila estado1 busco la columna estado2
         while(j<matriz.length && matriz[i][j]!=null && matriz[i][j].second() != estado2){
             j++;
         }
-        
+        //si no encontre la interseccion fila estado1 y columna estado2, intercambio la fila por la columna y busco de nuevo
         if(j==matriz.length || matriz[i][j]==null){
             i = 0;
             j = 0;
+            //recorro las filas en busca de la fila estado2
             while((i<matriz.length) && (matriz[i][j].first()!= estado2)){
                 i++;
             }
-        
+            //una vez que ya encontre la fila estado2 busco la columna estado1
             while(j<matriz.length && matriz[i][j]!=null && matriz[i][j].second() != estado1){
                 j++;
             }
         }
+        //una vez encontrado me fijo en la tercera componente de la interseccion si posee una x
         return matriz[i][j].third()=="x";
     }
         
    
+  //funcion  que retorna un booleano dependiendo si los dos automatas son equivalentes o iguales
    public boolean equalsAutomat(DFA A, DFA B){
        assert rep_ok();
        assert A.rep_ok();
@@ -805,7 +835,7 @@ public class DFA extends FA {
         return result;
     }
     
-    
+    //funcion que retorna una lista de string con todas los subString ordenado de un String
     private LinkedList<String> sub_List(String text){
         LinkedList<String> list = new LinkedList();
         for(int i = 0; i < text.length(); i++){
