@@ -281,8 +281,8 @@ public class DFA extends FA {
             			break;
             		}    			
             	}
-        	}
-		}
+            }
+	}
         
         return resp;
 	}
@@ -454,8 +454,43 @@ public class DFA extends FA {
 		assert rep_ok();
 		assert other.rep_ok();
 		// TODO
-		// Es el complemento de la union de los complementos de ambos DFA
-		return (complement().union(other.complement())).complement();		
+
+                //creo el alfabeto de la interseccion
+                Set<Character> intAlphabet = new HashSet<Character>();
+                intAlphabet.addAll(this.alfabeto);
+                intAlphabet.addAll(other.alphabet());
+                
+                // creo todos los estados de la interseccion
+                Set<State> intState = new HashSet<State>();
+                // creo un set con los estados del automata corriente sin los estados finales ya que queradan sin direccionar
+                Set<State> statesNoFinal = new HashSet<State>();
+                statesNoFinal.addAll(this.estados);
+                statesNoFinal.removeAll(this.estados_finales);
+                //guardo todos los estados
+                intState.addAll(statesNoFinal);
+                intState.addAll(other.states());
+                
+                //modifico las tanciciones que van hacia los estados finales y las hago que vallan al estado inicial del automata other
+                // y modifico las transiciones que salen de los estados finales y las hago que salgan del estado inicial del automata other.
+                Set<Triple<State,Character,State>> intTransitions = new HashSet<Triple<State,Character,State>>();
+                intTransitions.addAll(this.transiciones);
+                
+                Iterator<Triple<State,Character,State>> iterTrans = intTransitions.iterator();
+                while (iterTrans.hasNext()){
+                    Triple<State,Character,State> elemTrans = iterTrans.next();
+                    if (this.estados_finales.contains(elemTrans.first())){
+                        elemTrans.setFirst(other.initial_state());
+                    }
+                    if (this.estados_finales.contains(elemTrans.third())){
+                        elemTrans.setThird(other.initial_state());
+                    }
+                }
+                
+                intTransitions.addAll(other.transiciones);
+                
+                //Creo un DFA de la interseccion como resultado.
+		DFA intersection = new DFA(intState, intAlphabet, intTransitions, inicial, other.final_states());
+		return intersection;		
 	}
    
 	@Override
