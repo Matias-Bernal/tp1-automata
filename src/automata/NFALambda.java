@@ -68,24 +68,25 @@ public class NFALambda extends FA {
 		return this.estados_finales;
 	}
 
+        //funcion que retorna un conjunto de estados alcanzables desde un estado from a travez de un caracter c o de lambda
 	@Override
 	public Set<State> delta(State from, Character c) {
 		assert states().contains(from);
 		assert alphabet().contains(c);
 		// TODO
-        assert !(transiciones.isEmpty());
-        Set<State> result = new HashSet<State>();
-        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-        while (iterator.hasNext()){
-            Triple<State,Character,State> element = iterator.next();
-            if (element.first().equals(from) && element.second().equals(c) || element.first().equals(from) && element.second().equals(FA.Lambda)){
-                result.add(element.third());
-            }
-        }
-		return result;
-		
+                assert !(transiciones.isEmpty());
+                Set<State> result = new HashSet<State>();
+                Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+                while (iterator.hasNext()){
+                    Triple<State,Character,State> element = iterator.next();
+                    if (element.first().equals(from) && element.second().equals(c) || element.first().equals(from) && element.second().equals(FA.Lambda)){
+                        result.add(element.third());
+                    }
+                }
+		return result;		
 	}
 
+        //funcion que traduce un NFALambda al formato dot para luego ser impreso
 	@Override
 	public String to_dot() {
 		assert rep_ok();
@@ -115,7 +116,7 @@ public class NFALambda extends FA {
 	 *  Automata methods
 	*/	
 	
-	
+	//metodo de acceptacion de una cadena en un NFALambda
 	@Override
 	public boolean accepts(String string) {
 		assert rep_ok();
@@ -132,69 +133,71 @@ public class NFALambda extends FA {
 			}
 			return false;
 		}else{
-            Set<State> sucesor1 = new HashSet<State>();
-            sucesor1.addAll(delta(inicial,string.charAt(0)));
+                    Set<State> sucesor1 = new HashSet<State>();
+                    sucesor1.addAll(delta(inicial,string.charAt(0)));
             
-            if(sucesor1.isEmpty()){return false;}
+                    if(sucesor1.isEmpty()){return false;}
             
-            Set<State> sucesor2 = new HashSet<State>();
-            int i = 1;
-            while(i < string.length()){
-                if ((i%2) != 0){
-                	Tuple<Boolean,Set<State>> new_sucesor = deltaSet(sucesor1, string.charAt(i));
-                    if(!new_sucesor.first()){
-	                	sucesor2.addAll(new_sucesor.second()); //falta chequear el lambda
-	                    sucesor1.clear();
-	                    if(sucesor2.isEmpty()){
+                    Set<State> sucesor2 = new HashSet<State>();
+                    int i = 1;
+                    while(i < string.length()){
+                        if ((i%2) != 0){
+                            Tuple<Boolean,Set<State>> new_sucesor = deltaSet(sucesor1, string.charAt(i));
+                            if(!new_sucesor.first()){
+                                sucesor2.addAll(new_sucesor.second()); //falta chequear el lambda
+                                sucesor1.clear();
+                                if(sucesor2.isEmpty()){
 	                        return false;
-	                    }
-	                    i++;
-                    }else{
-	                    sucesor1.clear();
-                    	sucesor1.addAll(new_sucesor.second());
-                    	sucesor2.clear();
+                                }
+                                i++;
+                            }else{
+                                sucesor1.clear();
+                                sucesor1.addAll(new_sucesor.second());
+                                sucesor2.clear();
+                            }
+                        }else{
+                            Tuple<Boolean,Set<State>> new_sucesor = deltaSet(sucesor2, string.charAt(i));
+                            if(!new_sucesor.first()){
+                                sucesor1.addAll(new_sucesor.second()); 
+                                sucesor2.clear();
+                                if(sucesor1.isEmpty()){
+                                    return false;
+                                }
+                                i++;
+                            }else{
+                                sucesor2.clear();
+                                sucesor2.addAll(new_sucesor.second());
+                                sucesor1.clear();
+                            }
+                        }
                     }
-                }else{
-                	Tuple<Boolean,Set<State>> new_sucesor = deltaSet(sucesor2, string.charAt(i));
-                    if(!new_sucesor.first()){
-	                    sucesor1.addAll(new_sucesor.second()); 
-	                    sucesor2.clear();
-	                    if(sucesor1.isEmpty()){
-	                        return false;
-	                    }
-	                    i++;
+                    if (sucesor1.isEmpty()){
+                        return containFinal(sucesor2, estados_finales);
                     }else{
-	                    sucesor2.clear();
-                    	sucesor2.addAll(new_sucesor.second());
-                    	sucesor1.clear();
+                        return containFinal(sucesor1, estados_finales);
                     }
-                }
-            }
-            if (sucesor1.isEmpty()){
-                return containFinal(sucesor2, estados_finales);
-            }else{
-                return containFinal(sucesor1, estados_finales);
-            }
 		}
 	}
 	
-   public Tuple<Boolean,Set<State>> deltaSet(Set<State> from, Character c) {
-        assert states().containsAll(from);
-        assert alphabet().contains(c);
-        // TODO
-        assert !(transiciones.isEmpty());
-        boolean res = false;
-        Set<State> result = new HashSet<State>();
-        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-        while (iterator.hasNext()){
-            Triple<State,Character,State> element = iterator.next();
-            if ((from.contains(element.first()) && element.second().equals(c)) || (from.contains(element.first()) && element.second().equals(FA.Lambda))){
-                if(from.contains(element.first()) && element.second().equals(FA.Lambda))
+        //Funcion que devuelve una tupla el cual el primer elemento es un booleano que me dice si la transiciones tiene algun lambda
+        //y la segunda es el set de estados que se alcanzan desde otro set de estados apartir de un caracter o de lambda
+        public Tuple<Boolean,Set<State>> deltaSet(Set<State> from, Character c) {
+            assert states().containsAll(from);
+            assert alphabet().contains(c);
+            // TODO
+            assert !(transiciones.isEmpty());
+            boolean res = false;
+            Set<State> result = new HashSet<State>();
+            Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+            while (iterator.hasNext()){
+                Triple<State,Character,State> element = iterator.next();
+                if ((from.contains(element.first()) && element.second().equals(c)) || (from.contains(element.first()) && element.second().equals(FA.Lambda))){
+                    if(from.contains(element.first()) && element.second().equals(FA.Lambda))
                 	res = true;
-            	result.add(element.third());
+                        result.add(element.third());
+                }
             }
-        }
-        return new Tuple<Boolean, Set<State>>(res, result);	
+            return new Tuple<Boolean, Set<State>>(res, result);	
 	}
         
     //funcion que chequea si un set contiene por lo menos un estado final
@@ -268,7 +271,7 @@ public class NFALambda extends FA {
 		Set<State> inicialDFALambda = new HashSet<State>();
 		inicialDFALambda.add(inicial);
 		Set<State> A = clausura_lambda(inicialDFALambda);
-		// Incluír A en NuevosEstados; 
+		// Incluï¿½r A en NuevosEstados; 
 		Set<Set<State>> NuevosEstados = new HashSet<Set<State>>();
 		NuevosEstados.add(A);
 		Set<Set<State>> NuevosEstadosFinales = new HashSet<Set<State>>();
@@ -280,7 +283,7 @@ public class NFALambda extends FA {
 				break;
 			}
 		}
-		// WHILE no están todos los W de NuevosEstados marcados DO BEGIN 
+		// WHILE no estï¿½n todos los W de NuevosEstados marcados DO BEGIN 
 		Set<Set<State>> EstadosMarcados = new HashSet<Set<State>>();
 		while(!todosMarcados(NuevosEstados,EstadosMarcados)){
 			//Marcar W; 
@@ -302,11 +305,11 @@ public class NFALambda extends FA {
 					//X = Cerradura-lambda (Mueve (W, ai));
 					Set<State> X = new HashSet<State>();
 					X = clausura_lambda(mover(W, a));
-					// IF X no está en el conjunto NuevosEstados añadirlo;
+					// IF X no estï¿½ en el conjunto NuevosEstados aï¿½adirlo;
 					if(!perteneceNuevoEstados(NuevosEstados, X) && !X.isEmpty()){
 						NuevosEstados.add(X);
 					}
-					//Transición [W, a] = X;
+					//Transiciï¿½n [W, a] = X;
 					if(!X.isEmpty()){
 						T.add(new Triple<Set<State>, Character, Set<State>>(W, a, X));
 						Iterator<State> iteratorFianalesX = estados_finales.iterator();
@@ -428,6 +431,7 @@ public class NFALambda extends FA {
                 return false;
 	} 
 
+        //funcion que chequea que los estados finales enten dentro de los estados del automata
         private boolean checkFinalStates() {
             Iterator<State> iterator = estados_finales.iterator();
             while (iterator.hasNext()){
@@ -438,6 +442,8 @@ public class NFALambda extends FA {
             return true;
         }
 
+        //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
+        // y chequea que el caracter este dentro del arfabeto.
         private boolean checkTransition() {
             Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
             while (iterator.hasNext()){
