@@ -385,8 +385,12 @@ public class DFA extends FA {
 		assert rep_ok();
 		assert other.rep_ok();
 		// TODO	
-			//Union de los alfabetos
-			Set<Character> union_alfabeto = new HashSet<Character>();
+                
+                //renombro el automata other para que no me genere conflictos de nombres
+                other = renom(other);
+                
+                //Union de los alfabetos
+		Set<Character> union_alfabeto = new HashSet<Character>();
 	        union_alfabeto.addAll(alphabet());
 	        union_alfabeto.addAll(other.alphabet());
 	        //Union de estados
@@ -398,34 +402,12 @@ public class DFA extends FA {
 	        //Union de estados finales
 	        Set<State> union_finales = new HashSet<State>();
 	        union_finales.addAll(estados_finales);
-	        //Nuevo estado inicial
-			other.inicial.setName("?"+other.inicial.name().substring(1));
-	 
-			//renombrar estados del parametro
-	        Iterator<State> iterator = other.estados.iterator();
-	        while (iterator.hasNext()){
-	        	State corriente = iterator.next();
-	        	corriente.setName("?"+corriente.name().substring(1));
-	        	union_estados.add(corriente);
-	        }
-	
-	        //renombrar transacciones del parametro
-	        Iterator<Triple<State, Character, State>> iterator_transiciones = other.transiciones.iterator();
-	        while (iterator_transiciones.hasNext()){
-	        	Triple<State, Character, State> transicion_corriente = iterator_transiciones.next();
-	        	transicion_corriente.first().setName("?"+transicion_corriente.first().name().substring(1));
-	        	transicion_corriente.third().setName("?"+transicion_corriente.third().name().substring(1));
-	        	union_transitions.add(transicion_corriente);
-	        }
-	        
-	        //renombrar estados finales del parametro
-	        Iterator<State> iterator_estados_finales = other.estados_finales.iterator();
-	        while (iterator_estados_finales.hasNext()){
-	        	State estado_final_corriente = iterator_estados_finales.next();
-	        	estado_final_corriente.setName("?"+estado_final_corriente.name().substring(1));
-	        	union_finales.add(estado_final_corriente);
-	        }
-	         
+
+                
+	        union_estados.addAll(other.states());
+                union_transitions.addAll(other.transiciones);
+                union_finales.addAll(other.final_states());
+                
 	        //nuevo estado inicial "l0"
 	        State nuevo_inicial = new State("l0");
 	        union_estados.add(nuevo_inicial);
@@ -455,6 +437,9 @@ public class DFA extends FA {
 		assert other.rep_ok();
 		// TODO
 
+                //renombro el automata other para que no me genere conflictos de nombres
+                other = renom(other);
+                
                 //creo el alfabeto de la interseccion
                 Set<Character> intAlphabet = new HashSet<Character>();
                 intAlphabet.addAll(this.alfabeto);
@@ -493,6 +478,37 @@ public class DFA extends FA {
 		return intersection;		
 	}
    
+        //funcion que a base de un automata le renombra todos los estados, las transiciones, los estados finales y el estado inicial
+        //no remobra el arfabeto ya que no afecta al funcionamiento con otros automatas
+        private DFA renom(DFA other){
+                //Nuevo estado inicial
+		other.inicial.setName("?"+other.inicial.name().substring(1));
+            
+                //renombrar estados del parametro
+	        Iterator<State> iterator = other.estados.iterator();
+	        while (iterator.hasNext()){
+	        	State corriente = iterator.next();
+	        	corriente.setName("?"+corriente.name().substring(1));
+	        }
+	
+	        //renombrar transacciones del parametro
+	        Iterator<Triple<State, Character, State>> iterator_transiciones = other.transiciones.iterator();
+	        while (iterator_transiciones.hasNext()){
+	        	Triple<State, Character, State> transicion_corriente = iterator_transiciones.next();
+	        	transicion_corriente.first().setName("?"+transicion_corriente.first().name().substring(1));
+	        	transicion_corriente.third().setName("?"+transicion_corriente.third().name().substring(1));
+	        }
+	        
+	        //renombrar estados finales del parametro
+	        Iterator<State> iterator_estados_finales = other.estados_finales.iterator();
+	        while (iterator_estados_finales.hasNext()){
+	        	State estado_final_corriente = iterator_estados_finales.next();
+	        	estado_final_corriente.setName("?"+estado_final_corriente.name().substring(1));
+	        }
+                return other;
+        }
+        
+        
 	@Override
 	public boolean rep_ok() {
 		// TODO: Check that the alphabet does not contains lambda.
