@@ -69,11 +69,12 @@ public class DFA extends FA {
 		return this.estados_finales;
 	}
 	
+        //funcion que retorna un estado alcanzable desde un estado from a travez de un caracter c
 	@Override
 	public State delta(State from, Character c) {
 		assert states().contains(from);
 		assert alphabet().contains(c);
-        // TODO
+                // TODO
 	        assert !(transiciones.isEmpty());
 	        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
 	        while (iterator.hasNext()){
@@ -85,6 +86,7 @@ public class DFA extends FA {
 		return null;
 	}
 	
+        //funcion que traduce un DFA al formato dot para luego ser impreso
 	@Override
 	public String to_dot() {
 		assert rep_ok();
@@ -114,7 +116,7 @@ public class DFA extends FA {
 	 *  Automata methods
 	*/
 	
-	
+	//metodo de acceptacion de una cadena en un DFA
 	@Override
 	public boolean accepts(String string) {
         assert rep_ok();
@@ -176,39 +178,39 @@ public class DFA extends FA {
 		assert rep_ok();
 		// TODO       
 		if(estados_finales.contains(inicial)){
-                return false;
-            }
-            if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || estados_finales.isEmpty()){
-                return true;
-            }
-            
-            //me fijo si existe una cadena que partiendo desde el estado inicial llego a algun estado final
-            Set<State> sucesor1 = new HashSet<State>();
-            Set<State> sucesor2 = new HashSet<State>();
-            sucesor1.add(inicial);
-            boolean res = false;
-            int i = 0; 
-            while (res == false){
-                if ((i%2) == 0){
-                    sucesor2.addAll(sucesores(sucesor1, transiciones));
-                    sucesor1.clear();
-                    if(sucesor2.isEmpty()){
-                        return false;
-                    }else{
-                        res= containFinal(sucesor2, estados_finales);
-                    }
-                }else{
-                    sucesor1.addAll(sucesores(sucesor2, transiciones)); 
-                    sucesor2.clear();
-                    if(sucesor1.isEmpty()){
-                        return false;
-                    }else{
-                        res= containFinal(sucesor1, estados_finales);
-                    }
+                    return false;
                 }
-                i++;
-            }
-            return !res;
+                if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || estados_finales.isEmpty()){
+                    return true;
+                }
+            
+                //me fijo si existe una cadena que partiendo desde el estado inicial llego a algun estado final
+                Set<State> sucesor1 = new HashSet<State>();
+                Set<State> sucesor2 = new HashSet<State>();
+                sucesor1.add(inicial);
+                boolean res = false;
+                int i = 0; 
+                while (res == false){
+                    if ((i%2) == 0){
+                        sucesor2.addAll(sucesores(sucesor1, transiciones));
+                        sucesor1.clear();
+                        if(sucesor2.isEmpty()){
+                            return false;
+                        }else{
+                            res= containFinal(sucesor2, estados_finales);
+                        }
+                    }else{
+                        sucesor1.addAll(sucesores(sucesor2, transiciones)); 
+                        sucesor2.clear();
+                        if(sucesor1.isEmpty()){
+                            return false;
+                        }else{
+                            res= containFinal(sucesor1, estados_finales);
+                        }
+                    }
+                    i++;
+                }
+                return !res;
 	}
         
    // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
@@ -262,30 +264,30 @@ public class DFA extends FA {
 	public boolean sucesoresContineEstado(Set<State> visitados, State estado){
 		boolean resp = false;
 		Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-        while(iterator.hasNext()){
-            Triple<State,Character,State> element = iterator.next();
-            if(element.first().equals(estado)){
-            	if(element.third().equals(estado)){
-            		resp = false;
-            		break;
-            	}else{
-            		visitados.add(estado);
-            		if(!visitados.contains(element.third())){
-            			visitados.add(element.third());
-            			if(sucesoresContineEstado(visitados,element.third())){
-            				resp = true;
-            				break;
-            			}
-            		}else{
-            			resp = true;
-            			break;
-            		}    			
-            	}
-            }
-	}
-        
+                while(iterator.hasNext()){
+                    Triple<State,Character,State> element = iterator.next();
+                    if(element.first().equals(estado)){
+                        if(element.third().equals(estado)){
+                		resp = false;
+                		break;
+                        }else{
+                            visitados.add(estado);
+                            if(!visitados.contains(element.third())){
+                                visitados.add(element.third());
+                                if(sucesoresContineEstado(visitados,element.third())){
+                                    resp = true;
+                                    break;
+                                }
+                            }else{
+                                resp = true;
+                                break;
+                            }    			
+                        }
+                    }
+                }
         return resp;
 	}
+        
 	/**
 	 * Returns a new automaton which recognizes the complementary
 	 * language. 
@@ -505,6 +507,7 @@ public class DFA extends FA {
                 return false;
 	}
 
+    //funcion que chequea que los estados finales enten dentro de los estados del automata
     private boolean checkFinalStates() {
         Iterator<State> iterator = estados_finales.iterator();
         while (iterator.hasNext()){
@@ -515,6 +518,8 @@ public class DFA extends FA {
         return true;
     }
 
+    //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
+    // y chequea que el caracter este dentro del arfabeto    
     private boolean checkTransition() {
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
         while (iterator.hasNext()){
@@ -526,6 +531,7 @@ public class DFA extends FA {
         return true;
     }
 
+    //funcion que chequea que a base de un estado y un caracter no pueda ir a otro estado, o sea que sea un automata determinista
     private boolean checkDeterministic() {
         Set<Tuple<State,Character>> visitados = new HashSet<>();
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
@@ -540,7 +546,7 @@ public class DFA extends FA {
         return true;
     }
     
-        
+    //funcion que retorna la minimizacion del automata corriente   
     public DFA minimizeDFA (DFA automat){
         assert rep_ok();
         Triple min[][] = new Triple[this.estados.size()-1][this.estados.size()-1];
@@ -624,6 +630,7 @@ public class DFA extends FA {
         return automat;
     }
     
+    //funcion que pasa de un set de estados a un arreglo de estados
     private State[] to_Array(Set<State> state){
         
         Iterator <State> _st = state.iterator();
@@ -636,6 +643,7 @@ public class DFA extends FA {
             return array_state;
     }
     
+    //funcion que implementa el xor de booleanos
     private boolean xor(boolean x, boolean y){
         return ( ( x || y ) && ! ( x && y ) );
     }    

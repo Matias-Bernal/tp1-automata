@@ -10,7 +10,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import automata.State;
 import utils.Triple;
 import utils.Tuple;
 

@@ -63,6 +63,7 @@ public class NFA extends FA {
 		return this.estados_finales;
 	}
 
+        //funcion que retorna un conjunto de estados alcanzables desde un estado from a travez de un caracter c
 	@Override
 	public Set<State> delta(State from, Character c) {
 		assert states().contains(from);
@@ -78,9 +79,9 @@ public class NFA extends FA {
                     }
                 }
 		return result;
-		
 	}
 	
+        //funcion que traduce un NFA al formato dot para luego ser impreso
 	@Override
 	public String to_dot() {
 		assert rep_ok();
@@ -91,15 +92,15 @@ public class NFA extends FA {
 		assert !(transiciones.isEmpty());
 		Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
 		while (iterator.hasNext()){
-		Triple<State,Character,State> element = iterator.next();
-		dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
+                    Triple<State,Character,State> element = iterator.next();
+                    dot_graph += element.first().name()+"->"+element.third().name()+" [label=\""+element.second().toString()+"\"];\n";
 		}
 		dot_graph += "\n";
 		assert !(transiciones.isEmpty());
 		Iterator<State> iteratorfinal = final_states().iterator();
 		while (iteratorfinal.hasNext()){
-		State element = iteratorfinal.next();
-		dot_graph += element.name()+"[shape=doublecircle];\n"; 
+                    State element = iteratorfinal.next();
+                    dot_graph += element.name()+"[shape=doublecircle];\n"; 
 		}
 		dot_graph += "}";
 		return dot_graph;
@@ -110,47 +111,48 @@ public class NFA extends FA {
 	 *  Automata methods
 	*/	
 	
-	
+	//metodo de acceptacion de una cadena en un NFA
 	@Override
 	public boolean accepts(String string) {
 		assert rep_ok();
 		assert string != null;
 		assert verify_string(string);
                 //TODO
-				if(string==""){
-					return estados_finales.contains(inicial);
-				}else{
-	                Set<State> sucesor1 = new HashSet<State>();
-	                sucesor1.addAll(delta(inicial,string.charAt(0)));
+		if(string==""){
+                    return estados_finales.contains(inicial);
+		}else{
+                    Set<State> sucesor1 = new HashSet<State>();
+	            sucesor1.addAll(delta(inicial,string.charAt(0)));
 	                
-	                if(sucesor1.isEmpty()){return false;}
+	            if(sucesor1.isEmpty()){return false;}
 	                
-	                Set<State> sucesor2 = new HashSet<State>();
-	                int i = 1;
-	                while(i < string.length()){
-	                    if ((i%2) != 0){
-	                        sucesor2.addAll(deltaSet(sucesor1, string.charAt(i)));
-	                        sucesor1.clear();
-	                        if(sucesor2.isEmpty()){
-	                            return false;
-	                        }
-	                    }else{
-	                        sucesor1.addAll(deltaSet(sucesor2, string.charAt(i))); 
-	                        sucesor2.clear();
-	                        if(sucesor1.isEmpty()){
-	                            return false;
-	                        }
+	            Set<State> sucesor2 = new HashSet<State>();
+	            int i = 1;
+	            while(i < string.length()){
+                        if ((i%2) != 0){
+                            sucesor2.addAll(deltaSet(sucesor1, string.charAt(i)));
+	                    sucesor1.clear();
+	                    if(sucesor2.isEmpty()){
+                                return false;
 	                    }
-	                    i++;
-	                }
-	                if (sucesor1.isEmpty()){
-	                    return containFinal(sucesor2, estados_finales);
 	                }else{
-	                    return containFinal(sucesor1, estados_finales);
+	                    sucesor1.addAll(deltaSet(sucesor2, string.charAt(i))); 
+	                    sucesor2.clear();
+	                    if(sucesor1.isEmpty()){
+	                        return false;
+	                    }
 	                }
-				}
+	                i++;
+	             }
+	             if (sucesor1.isEmpty()){
+	                return containFinal(sucesor2, estados_finales);
+	             }else{
+	                return containFinal(sucesor1, estados_finales);
+	             }
+		}
 	}
         
+    //Funcion que devuelve un set de estados que se alcanzan desde otro set de estados apartir de un caracter   
     public Set<State> deltaSet(Set<State> from, Character c) {
         assert states().containsAll(from);
         assert alphabet().contains(c);
@@ -165,7 +167,7 @@ public class NFA extends FA {
             }
         }
         return result;	
-	}
+    }
         
     //funcion que cheque si un set contiene por lo menos un estado final
     private boolean containFinal(Set<State> states, Set<State> finals){
@@ -187,12 +189,11 @@ public class NFA extends FA {
 	public DFA toDFA() {
 		assert rep_ok();
 		// TODO                
-        Triple<State,Character,State> trasition = new Triple<State, Character, State>(inicial, FA.Lambda, inicial);
-        Set<Triple<State,Character,State>> trasitions = new HashSet<Triple<State,Character,State>>();
-        trasitions.addAll(transiciones);
-        trasitions.add(trasition);
-        NFALambda nfalambda = new NFALambda(estados, alfabeto, trasitions, inicial, estados_finales);
-		
+                Triple<State,Character,State> trasition = new Triple<State, Character, State>(inicial, FA.Lambda, inicial);
+                Set<Triple<State,Character,State>> trasitions = new HashSet<Triple<State,Character,State>>();
+                trasitions.addAll(transiciones);
+                trasitions.add(trasition);
+                NFALambda nfalambda = new NFALambda(estados, alfabeto, trasitions, inicial, estados_finales);
 		return nfalambda.toDFA();
 	}
 
@@ -209,6 +210,7 @@ public class NFA extends FA {
                 return false;
 	} 
 
+        //funcion que chequea que los estados finales enten dentro de los estados del automata
         private boolean checkFinalStates() {
             Iterator<State> iterator = estados_finales.iterator();
             while (iterator.hasNext()){
@@ -218,7 +220,9 @@ public class NFA extends FA {
             }
             return true;
         }
-
+       
+        //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
+        // y chequea que el caracter este dentro del arfabeto.
         private boolean checkTransition() {
             Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
             while (iterator.hasNext()){
