@@ -707,7 +707,19 @@ public class DFA extends FA {
     //imprime las líneas que contengan coincidencias para la expresión regular. 
     public String grep(){
         assert rep_ok();
-        return ;
+        return null;
+    }
+    
+    
+    public Set<Triple<State,Character,State>> getTransiciones(){
+    	return transiciones;
+    }
+    
+    public void setTransiciones(Set<Triple<State,Character,State>> transiciones) throws IllegalArgumentException{
+    	this.transiciones = transiciones;
+    	if(!rep_ok()){
+			throw new IllegalArgumentException();		
+		}
     }
   
 }
