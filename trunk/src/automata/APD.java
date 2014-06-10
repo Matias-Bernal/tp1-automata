@@ -37,7 +37,7 @@ public class APD {
 	@SuppressWarnings("resource")
 	public APD(String path_file) throws IllegalArgumentException, IOException {	
 		//Abrir el archivo
-		File file = new File (path_file);;
+		File file = new File (path_file);
 		FileReader fr = new FileReader (file);
 		BufferedReader br = new BufferedReader(fr);
 		
