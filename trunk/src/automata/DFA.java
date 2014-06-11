@@ -175,39 +175,36 @@ public class DFA extends FA {
 		assert rep_ok();
 		// TODO       
 		if(estados_finales.contains(inicial)){
+			return false;
+		}
+        if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || estados_finales.isEmpty()){
+            return true;
+        }
+        //me fijo si existe una cadena que partiendo desde el estado inicial llego a algun estado final
+        Set<State> sucesor1 = new HashSet<State>();
+        Set<State> sucesor2 = new HashSet<State>();
+        sucesor1.add(inicial);
+        boolean res = false;
+        while (!res){
+            if (sucesor2.isEmpty()){
+                sucesor2.addAll(sucesores(sucesor1, transiciones));
+                sucesor1.clear();
+                if(sucesor2.isEmpty()){
                     return false;
+                }else{
+                    res = containFinal(sucesor2, estados_finales);
                 }
-                if(estados.isEmpty() || inicial==null || transiciones.isEmpty() || estados_finales.isEmpty()){
-                    return true;
+            }else{
+                sucesor1.addAll(sucesores(sucesor2, transiciones)); 
+                sucesor2.clear();
+                if(sucesor1.isEmpty()){
+                    return false;
+                }else{
+                    res= containFinal(sucesor1, estados_finales);
                 }
-            
-                //me fijo si existe una cadena que partiendo desde el estado inicial llego a algun estado final
-                Set<State> sucesor1 = new HashSet<State>();
-                Set<State> sucesor2 = new HashSet<State>();
-                sucesor1.add(inicial);
-                boolean res = false;
-                int i = 0; 
-                while (res == false){
-                    if ((i%2) == 0){
-                        sucesor2.addAll(sucesores(sucesor1, transiciones));
-                        sucesor1.clear();
-                        if(sucesor2.isEmpty()){
-                            return false;
-                        }else{
-                            res= containFinal(sucesor2, estados_finales);
-                        }
-                    }else{
-                        sucesor1.addAll(sucesores(sucesor2, transiciones)); 
-                        sucesor2.clear();
-                        if(sucesor1.isEmpty()){
-                            return false;
-                        }else{
-                            res= containFinal(sucesor1, estados_finales);
-                        }
-                    }
-                    i++;
-                }
-                return !res;
+            }
+        }
+        return true;
 	}
         
    // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
@@ -385,43 +382,43 @@ public class DFA extends FA {
 		assert other.rep_ok();
 		// TODO	
                 
-                //renombro el automata other para que no me genere conflictos de nombres
-                other = renom(other);
-                
-                //Union de los alfabetos
-		Set<Character> union_alfabeto = new HashSet<Character>();
-	        union_alfabeto.addAll(alphabet());
-	        union_alfabeto.addAll(other.alphabet());
-	        //Union de estados
-	        Set<State> union_estados = new HashSet<State>();
-	        union_estados.addAll(estados);
-	        //Union de transiciones
-	        Set<Triple<State,Character,State>> union_transitions = new HashSet<Triple<State,Character,State>>();
-	        union_transitions.addAll(transiciones);
-	        //Union de estados finales
-	        Set<State> union_finales = new HashSet<State>();
-	        union_finales.addAll(estados_finales);
+        //renombro el automata other para que no me genere conflictos de nombres
+        other = renombrar(other,'r');
+        
+        //Union de los alfabetos
+        Set<Character> union_alfabeto = new HashSet<Character>();
+        union_alfabeto.addAll(alphabet());
+        union_alfabeto.addAll(other.alphabet());
+        //Union de estados
+        Set<State> union_estados = new HashSet<State>();
+        union_estados.addAll(estados);
+        //Union de transiciones
+        Set<Triple<State,Character,State>> union_transitions = new HashSet<Triple<State,Character,State>>();
+        union_transitions.addAll(transiciones);
+        //Union de estados finales
+        Set<State> union_finales = new HashSet<State>();
+        union_finales.addAll(estados_finales);
 
-                
-	        union_estados.addAll(other.states());
-                union_transitions.addAll(other.transiciones);
-                union_finales.addAll(other.final_states());
-                
-	        //nuevo estado inicial "l0"
-	        State nuevo_inicial = new State("l0");
-	        union_estados.add(nuevo_inicial);
-	        //agregado la transaccion l0->q0 [label="Lambda"]; 
-	        //agregado la transaccion l0->?0 [label="Lambda"];       
-	        Triple<State, Character, State> aP = new Triple<State, Character, State>(nuevo_inicial, Lambda, other.inicial);
-	        Triple<State, Character, State> aQ = new Triple<State, Character, State>(nuevo_inicial, Lambda, inicial);
-	 
-	        union_transitions.add(aP);
-	        union_transitions.add(aQ);                
-	        //Nuevo NFALambda con las uniones y un nuevo estado inicial con dos transacciones lambda a los iniciales de los AFD
-	        NFALambda nfaLambda = new NFALambda(union_estados, union_alfabeto, union_transitions, nuevo_inicial, union_finales); 
-	        
-	        DFA dfa = nfaLambda.toDFA();
-	        return dfa;
+            
+        union_estados.addAll(other.states());
+            union_transitions.addAll(other.transiciones);
+            union_finales.addAll(other.final_states());
+            
+        //nuevo estado inicial "l0"
+        State nuevo_inicial = new State("l0");
+        union_estados.add(nuevo_inicial);
+        //agregado la transaccion l0->q0 [label="Lambda"]; 
+        //agregado la transaccion l0->?0 [label="Lambda"];       
+        Triple<State, Character, State> aP = new Triple<State, Character, State>(nuevo_inicial, Lambda, other.inicial);
+        Triple<State, Character, State> aQ = new Triple<State, Character, State>(nuevo_inicial, Lambda, inicial);
+ 
+        union_transitions.add(aP);
+        union_transitions.add(aQ);                
+        //Nuevo NFALambda con las uniones y un nuevo estado inicial con dos transacciones lambda a los iniciales de los AFD
+        NFALambda nfaLambda = new NFALambda(union_estados, union_alfabeto, union_transitions, nuevo_inicial, union_finales); 
+        
+        DFA dfa = nfaLambda.toDFA();
+        return dfa;
         }
 	
 	/**
@@ -436,75 +433,84 @@ public class DFA extends FA {
 		assert other.rep_ok();
 		// TODO
 
-                //renombro el automata other para que no me genere conflictos de nombres
-                other = renom(other);
-                
-                //creo el alfabeto de la interseccion
-                Set<Character> intAlphabet = new HashSet<Character>();
-                intAlphabet.addAll(this.alfabeto);
-                intAlphabet.addAll(other.alphabet());
-                
-                // creo todos los estados de la interseccion
-                Set<State> intState = new HashSet<State>();
-                // creo un set con los estados del automata corriente sin los estados finales ya que queradan sin direccionar
-                Set<State> statesNoFinal = new HashSet<State>();
-                statesNoFinal.addAll(this.estados);
-                statesNoFinal.removeAll(this.estados_finales);
-                //guardo todos los estados
-                intState.addAll(statesNoFinal);
-                intState.addAll(other.states());
-                
-                //modifico las tanciciones que van hacia los estados finales y las hago que vallan al estado inicial del automata other
-                // y modifico las transiciones que salen de los estados finales y las hago que salgan del estado inicial del automata other.
-                Set<Triple<State,Character,State>> intTransitions = new HashSet<Triple<State,Character,State>>();
-                intTransitions.addAll(this.transiciones);
-                
-                Iterator<Triple<State,Character,State>> iterTrans = intTransitions.iterator();
-                while (iterTrans.hasNext()){
-                    Triple<State,Character,State> elemTrans = iterTrans.next();
-                    if (this.estados_finales.contains(elemTrans.first())){
-                        elemTrans.setFirst(other.initial_state());
-                    }
-                    if (this.estados_finales.contains(elemTrans.third())){
-                        elemTrans.setThird(other.initial_state());
-                    }
-                }
-                
-                intTransitions.addAll(other.transiciones);
-                
-                //Creo un DFA de la interseccion como resultado.
-                DFA intersection = new DFA(intState, intAlphabet, intTransitions, inicial, other.final_states());
-                return intersection;		
+        //renombro el automata other para que no me genere conflictos de nombres
+        other = renombrar(other,'r');
+        
+        //creo el alfabeto de la interseccion
+        Set<Character> interseccion_alfabeto = new HashSet<Character>();
+        interseccion_alfabeto.addAll(this.alfabeto);
+        interseccion_alfabeto.addAll(other.alphabet());
+        interseccion_alfabeto.add(FA.Lambda);
+
+        // creo todos los estados de la interseccion
+        Set<State> interseccion_estados = new HashSet<State>();
+        // creo un set con los estados del automata corriente sin los estados finales ya que queradan sin direccionar
+        interseccion_estados.addAll(estados);
+        interseccion_estados.addAll(other.estados);
+        // el nuevo estado inicial
+        State interseccion_estado_inicial = inicial;
+        // los nuevos estados finales
+        Set<State> interseccion_estados_finales = new HashSet<State>();
+        interseccion_estados_finales.addAll(other.estados_finales);
+        // las nuevas transiciones       
+        Set<Triple<State,Character,State>> interseccionTransiciones = new HashSet<Triple<State,Character,State>>();
+        interseccionTransiciones.addAll(transiciones);
+        interseccionTransiciones.addAll(other.transiciones);
+
+        Iterator<State> iterador_estados_finales = estados_finales.iterator();
+        while (iterador_estados_finales.hasNext()){
+            State estado_final = iterador_estados_finales.next();
+            Triple<State,Character,State> transition_lambda = new Triple<State, Character, State>(estado_final, FA.Lambda, other.inicial);            
+            interseccionTransiciones.add(transition_lambda);
+        }
+   
+        //Creo un DFA de la interseccion como resultado.
+        NFALambda automata = new NFALambda(interseccion_estados, interseccion_alfabeto, interseccionTransiciones, interseccion_estado_inicial, interseccion_estados_finales);
+        return automata.toDFA();
+        
+        // Es el complemento de la union de los complementos de ambos DFA
+        // return (complement().union(other.complement())).complement();
 	}
    
         //funcion que a base de un automata le renombra todos los estados, las transiciones, los estados finales y el estado inicial
         //no remobra el arfabeto ya que no afecta al funcionamiento con otros automatas
-        private DFA renom(DFA other){
-                //Nuevo estado inicial
-		other.inicial.setName("?"+other.inicial.name().substring(1));
+        private DFA renombrar(DFA other, Character a){
+            //Nuevo estado inicial
+        	
+        	State new_inicial = new State(a+other.inicial.name().substring(1));
+        	
+        	Set<Character> new_alfabet = new HashSet<Character>();
+        	new_alfabet.addAll(other.alfabeto);
+        	
+        	Set<State> new_estados = new HashSet<State>();
+        	Set<State> new_estados_finales = new HashSet<State>();
+        	
+        	new_estados.add(new_inicial);
             
-                //renombrar estados del parametro
-	        Iterator<State> iterator = other.estados.iterator();
-	        while (iterator.hasNext()){
-	        	State corriente = iterator.next();
-	        	corriente.setName("?"+corriente.name().substring(1));
-	        }
-	
+        	if(other.estados_finales.contains(other.inicial))
+        		new_estados_finales.add(new_inicial);
 	        //renombrar transacciones del parametro
 	        Iterator<Triple<State, Character, State>> iterator_transiciones = other.transiciones.iterator();
+	        Set<Triple<State, Character, State>> new_transitions = new HashSet<Triple<State, Character, State>>();
+	        
+
 	        while (iterator_transiciones.hasNext()){
 	        	Triple<State, Character, State> transicion_corriente = iterator_transiciones.next();
-	        	transicion_corriente.first().setName("?"+transicion_corriente.first().name().substring(1));
-	        	transicion_corriente.third().setName("?"+transicion_corriente.third().name().substring(1));
+	        	State from_state = new State(a+transicion_corriente.first().name().substring(1));
+	        	if(!new_estados.contains(from_state))
+	        		new_estados.add(from_state);
+	        	if(other.final_states().contains(transicion_corriente.first()))
+	        		new_estados_finales.add(from_state);
+	        	State to_state = new State(a+transicion_corriente.third().name().substring(1));
+	        	if(!new_estados.contains(to_state))
+	        		new_estados.add(to_state);
+	        	if(other.final_states().contains(transicion_corriente.third()))
+	        		new_estados_finales.add(to_state);
+	        	Triple<State, Character, State> new_transition = new Triple<State, Character, State>(from_state, transicion_corriente.second(), to_state);
+	        	new_transitions.add(new_transition);
 	        }
-	        
-	        //renombrar estados finales del parametro
-	        Iterator<State> iterator_estados_finales = other.estados_finales.iterator();
-	        while (iterator_estados_finales.hasNext()){
-	        	State estado_final_corriente = iterator_estados_finales.next();
-	        	estado_final_corriente.setName("?"+estado_final_corriente.name().substring(1));
-	        }
-                return other;
+	        DFA automata = new DFA(new_estados, new_alfabet, new_transitions, new_inicial, new_estados_finales);
+            return automata;
         }
         
         
