@@ -1,9 +1,6 @@
 package automata;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import utils.ExpresionRegular;
@@ -814,7 +811,7 @@ public class DFA extends FA {
    
     //Lee la entrada estándar o una lista de archivos e 
     //imprime las líneas que contengan coincidencias para la expresión regular. 
-    public String grep(String regular_exp, String path_file) throws IOException{
+    public String grep(String regular_exp, String path_file) throws FileNotFoundException, IOException{
         assert rep_ok();
         assert (regular_exp != null);
         assert (path_file != null);
@@ -824,24 +821,30 @@ public class DFA extends FA {
         DFA automata = er.toDFA();
         
         String result = "";
-       
-        File file = new File (path_file);
-        FileReader fr = new FileReader (file);
-        BufferedReader br = new BufferedReader(fr);
+        try{
+            File file = new File (path_file);
+            FileReader fr = new FileReader (file);
+            BufferedReader br = new BufferedReader(fr);
         
-        String line = br.readLine();
-        LinkedList<String> sub_String = new LinkedList();
-        while(line != null){
-            sub_String = sub_List(line);
-            if(automata.accepts(line)){
-                result += line + "/n";
-            }
-            for(int i=0; i<sub_String.size(); i++){
-                if(automata.accepts(sub_String.get(i))){
+            String line = br.readLine();
+            LinkedList<String> sub_String = new LinkedList();
+            while(line != null){
+                sub_String = sub_List(line);
+                if(automata.accepts(line)){
                     result += line + "/n";
                 }
+                for(int i=0; i<sub_String.size(); i++){
+                    if(automata.accepts(sub_String.get(i))){
+                        result += line + "/n";
+                    }
+                }
+                line = br.readLine();
             }
-            line = br.readLine();
+        }catch(FileNotFoundException ex){
+            throw ex;
+        }
+        catch(IOException ex){
+            throw ex;
         }
         return result;
     }
