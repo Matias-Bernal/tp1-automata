@@ -215,30 +215,59 @@ public class NFALambda extends FA {
 	
 	public Set<State> clausura_lambda(Set<State> estado){
 		assert !(transiciones.isEmpty());
+		assert estado!=null;
+		// R = P sin marcar
 		Set<State> result = estado;
-		Iterator<State> iteratorState = estado.iterator();
-		Iterator<Triple<State,Character,State>> iteratorTrasitions = transiciones.iterator();
-		while (iteratorState.hasNext()){
-			State element = iteratorState.next();
+		Set<State> marcados = new HashSet<State>() ;
+		// mientras hay elementos en P sin marcar
+		while (!marcados.equals(result)){
+			Iterator<State> iteratorEstados = estado.iterator();
+			// obtener q sin marcar
+			State q = null;
+			while (iteratorEstados.hasNext()){
+				State _estado = iteratorEstados.next();
+				if (!marcados.contains(_estado)){
+					q = _estado;
+					break;
+				}
+			}
+			// marcar q
+			marcados.add(q);
+			Iterator<Triple<State,Character,State>> iteratorTrasitions = transiciones.iterator();
 			while (iteratorTrasitions.hasNext()){
 				Triple<State,Character,State> transition = iteratorTrasitions.next();
-				if(transition.first().equals(element) && transition.second().equals(Lambda)){
-					if (!result.contains(transition.third())){
-						result.add(transition.third());
-						Set<State> aux = new HashSet<State>();
-						aux.add(transition.third());
-						Set<State> aux2 = clausura_lambda(aux);
-						Iterator<State> iteratorAux = aux2.iterator();
-						while (iteratorAux.hasNext()){
-							State elementAux = iteratorAux.next();
-							if (!result.contains(elementAux))
-								result.add(elementAux);
-						}
-					}
+				if(transition.first().equals(q) && transition.second().equals(Lambda)){
+					result.add(transition.third());
 				}
 			}
 		}
+		
 		return result;
+		
+//		
+//		Iterator<State> iteratorState = estado.iterator();
+//		Iterator<Triple<State,Character,State>> iteratorTrasitions = transiciones.iterator();
+//		while (iteratorState.hasNext()){
+//			State element = iteratorState.next();
+//			while (iteratorTrasitions.hasNext()){
+//				Triple<State,Character,State> transition = iteratorTrasitions.next();
+//				if(transition.first().equals(element) && transition.second().equals(Lambda)){
+//					if (!result.contains(transition.third())){
+//						result.add(transition.third());
+//						Set<State> aux = new HashSet<State>();
+//						aux.add(transition.third());
+//						Set<State> aux2 = clausura_lambda(aux);
+//						Iterator<State> iteratorAux = aux2.iterator();
+//						while (iteratorAux.hasNext()){
+//							State elementAux = iteratorAux.next();
+//							if (!result.contains(elementAux))
+//								result.add(elementAux);
+//						}
+//					}
+//				}
+//			}
+//		}
+//		return result;
 	}
 	
 	public Set<State> mover (Set<State> estado, Character a){
@@ -246,16 +275,27 @@ public class NFALambda extends FA {
 		Iterator<State> iteratorState = estado.iterator();
 		while (iteratorState.hasNext()){
 			State element = iteratorState.next();
-			Set<State> aux = delta(element,a);
-			Iterator<State> iteratorAux = aux.iterator();
-			while (iteratorAux.hasNext()){
-				State elementaux = iteratorAux.next();
-				if(!result.contains(elementaux))
-					result.add(elementaux);
+			Iterator<Triple<State,Character,State>> iteratorTrasitions = transiciones.iterator();
+			while (iteratorTrasitions.hasNext()){
+				Triple<State,Character,State> transition = iteratorTrasitions.next();
+				if(transition.first().equals(element) && transition.second().equals(a)){
+					result.add(transition.third());
+				}
 			}
 		}
-		return result;
+		return clausura_lambda(result);
 	}
+			
+//			Set<State> aux = delta(element,a);
+//			Iterator<State> iteratorAux = aux.iterator();
+//			while (iteratorAux.hasNext()){
+//				State elementaux = iteratorAux.next();
+//				if(!result.contains(elementaux))
+//					result.add(elementaux);
+//			}
+//		}
+//		return result;
+//	}
 	
 	/**
 	 * Converts the automaton to a DFA.
