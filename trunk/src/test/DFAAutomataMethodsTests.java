@@ -134,4 +134,10 @@ public class DFAAutomataMethodsTests {
 		assertFalse(dfa.star().is_finite());
 	}
 	
+        @Test
+        public void test20() throws Exception {
+            DFA dfa = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
+            String prueba = dfa.grep( "bb", "prueba.txt");
+            assertTrue(!prueba.equals(""));
+        }
 }
