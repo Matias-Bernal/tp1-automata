@@ -120,7 +120,7 @@ public class DFA extends FA {
 		assert string != null;
 		assert verify_string(string);
 		// TODO
-			if(string==""){
+			if(string.isEmpty()){
 				return estados_finales.contains(inicial);
 			}else{
                 State state = delta(inicial, string.charAt(0));
@@ -830,18 +830,18 @@ public class DFA extends FA {
         try{
             File file = new File (path_file);
             FileReader fr = new FileReader (file);
-            BufferedReader br = new BufferedReader(fr);
+            @SuppressWarnings("resource")
+			BufferedReader br = new BufferedReader(fr);
         
             String line = br.readLine();
-            LinkedList<String> sub_String = new LinkedList();
+            LinkedList<String> sub_String = new LinkedList<String>();
             while(line != null){
                 sub_String = sub_List(line);
-                if(automata.accepts(line)){
-                    result += line + "/n";
-                }
                 for(int i=0; i<sub_String.size(); i++){
-                    if(automata.accepts(sub_String.get(i))){
+                	String text = sub_String.get(i);
+                    if(automata.accepts(text)){
                         result += line + "/n";
+                        break;
                     }
                 }
                 line = br.readLine();
