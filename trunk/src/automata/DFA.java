@@ -11,11 +11,18 @@ import utils.Tuple;
 */
 public class DFA extends FA {
 
-	/*	
-	 * 	Construction
-	*/
-	
-	// Constructor
+	/** DFA(): Contructor con parametros de la clase DFA
+	 * <li>pre: true </li>
+	 * <li>post: DFA </li>
+	 * <hr>
+	 * @param states
+         * @param alphabet 
+         * @param transitions
+         * @param initial
+         * @param final_states
+	 * @return ADF
+	 * @throws IllegalArgumentException
+	 */
 	public DFA(	Set<State> states,
 			Set<Character> alphabet,
 			Set<Triple<State,Character,State>> transitions,
@@ -66,7 +73,16 @@ public class DFA extends FA {
 		return this.estados_finales;
 	}
 	
-        //funcion que retorna un estado alcanzable desde un estado from a travez de un caracter c
+        
+        
+        /** delta(): Funcion que retorna un estado alcanzable desde un estado from a travez de un caracter c
+	 * <li>pre: state!= null and character!=null </li>
+	 * <li>post:  </li>
+	 * <hr>
+	 * @param states
+         * @param c
+	 * @return State or null
+	 */
 	@Override
 	public State delta(State from, Character c) {
 		assert states().contains(from);
@@ -83,7 +99,13 @@ public class DFA extends FA {
 		return null;
 	}
 	
-        //funcion que traduce un DFA al formato dot para luego ser impreso
+        
+        /** to_dot(): Funcion que traduce un DFA al formato dot para luego ser impreso.
+	 * <li>pre: true </li>
+	 * <li>post:  </li>
+	 * <hr>
+	 * @return String
+	 */
 	@Override
 	public String to_dot() {
 		assert rep_ok();
@@ -113,7 +135,13 @@ public class DFA extends FA {
 	 *  Automata methods
 	*/
 	
-	//metodo de acceptacion de una cadena en un DFA
+        /** accepts(): Metodo de acceptacion de una cadena en un DFA
+	 * <li>pre: string </li>
+	 * <li>post:  </li>
+	 * <hr>
+         * @param string
+	 * @return Boolean
+	 */	
 	@Override
 	public boolean accepts(String string) {
         assert rep_ok();
@@ -133,9 +161,10 @@ public class DFA extends FA {
 			}
 	}
 
-	/**
-	 * Converts the automaton to a NFA.
-	 * 
+        /** toNFA(): Converts the automaton to a NFA.
+	 * <li>pre: true </li>
+	 * <li>post:  </li>
+	 * <hr>
 	 * @return NFA recognizing the same language.
 	 */
 	public NFA toNFA() {
@@ -145,9 +174,10 @@ public class DFA extends FA {
 		return nfaAutomata;
 	}
 	
-	/**
-	 * Converts the automaton to a NFALambda.
-	 * 
+        /** toNFALambda(): Converts the automaton to a NFALambda.
+	 * <li>pre: true </li>
+	 * <li>post:  </li>
+	 * <hr>
 	 * @return NFALambda recognizing the same language.
 	 */
 	public NFALambda toNFALambda() {
@@ -166,10 +196,12 @@ public class DFA extends FA {
 		return nfaLamdaAutomata;
 	}
 
-	/**
-	 * Checks the automaton for language emptiness.
-	 * 
-	 * @returns True iff the automaton's language is empty.
+        
+        /** is_empty(): Checks the automaton for language emptiness.
+	 * <li>pre: true </li>
+	 * <li>post:  </li>
+	 * <hr>
+	 * @return True iff the automaton's language is empty.
 	 */
 	public boolean is_empty() {
 		assert rep_ok();
@@ -206,8 +238,17 @@ public class DFA extends FA {
         }
         return true;
 	}
+   
         
-   // funcion que a base de un set de estados y un arreglo de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
+    /** sucesores(): funcion que a base de un set de estados y un arreglo 
+     * de transiciones, devuelve un set de sucesores de todos los estados ingresados como parametro
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param estados 
+     * @param transiciones 
+     * @return result
+    */ 
     private Set<State> sucesores(Set<State> estados, Set<Triple<State, Character, State>> transiciones){
         Set<State> result = new HashSet<State>();
         Iterator<Triple<State, Character, State>> iterator = transiciones.iterator();
@@ -220,7 +261,15 @@ public class DFA extends FA {
         return result;
     }
         
-    //funcion que cheque si un set contiene por lo menos un estado final
+    /** containFinal(): //funcion que cheque si un set contiene por lo menos un estado final
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param states
+     * @param finals 
+     * @return boolean
+    */ 
+    
     private boolean containFinal(Set<State> states, Set<State> finals){
         Iterator<State> iterator = states.iterator();
         while(iterator.hasNext()){
@@ -232,62 +281,73 @@ public class DFA extends FA {
         return false;
     }
         
-	/**
-	 * Checks the automaton for language infinity.
-	 * 
-	 * @returns True iff the automaton's language is finite.
-	 */
-	public boolean is_finite() {
-            assert rep_ok();
-            boolean resp = true;
+    /** is_finite():Checks the automaton for language infinity.
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param states
+     * @param finals 
+     * @returns True iff the automaton's language is finite.
+    */
+    public boolean is_finite() {
+        assert rep_ok();
+        boolean resp = true;
             
-            //Veo si los sucesores de un estado contiene a dicho estado            
-            Iterator<State> iteratorState = estados.iterator();
-            while(iteratorState.hasNext()){
-                Set<State> visitados = new HashSet<State>();
-            	State currentState = iteratorState.next();
-            	visitados.add(currentState);
-            	if (sucesoresContineEstado(visitados,currentState)){
-            		resp = false;
+        //Veo si los sucesores de un estado contiene a dicho estado            
+        Iterator<State> iteratorState = estados.iterator();
+        while(iteratorState.hasNext()){
+            Set<State> visitados = new HashSet<State>();
+            State currentState = iteratorState.next();
+            visitados.add(currentState);
+            if (sucesoresContineEstado(visitados,currentState)){
+                resp = false;
             		break;
-            	}
             }
-            return resp; 
-	}
-		
-	public boolean sucesoresContineEstado(Set<State> visitados, State estado){
-		boolean resp = false;
-		Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
-                while(iterator.hasNext()){
-                    Triple<State,Character,State> element = iterator.next();
-                    if(element.first().equals(estado)){
-                        if(element.third().equals(estado)){
-                		resp = false;
-                		break;
-                        }else{
-                            visitados.add(estado);
-                            if(!visitados.contains(element.third())){
-                                visitados.add(element.third());
-                                if(sucesoresContineEstado(visitados,element.third())){
-                                    resp = true;
-                                    break;
-                                }
-                            }else{
-                                resp = true;
-                                break;
-                            }    			
+        }
+        return resp; 
+    }
+
+    /** sucesoresContineEstado():
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param visitados
+     * @param estado
+     * @returns boolean
+    */
+    public boolean sucesoresContineEstado(Set<State> visitados, State estado){
+        boolean resp = false;
+        Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
+        while(iterator.hasNext()){
+            Triple<State,Character,State> element = iterator.next();
+            if(element.first().equals(estado)){
+                if(element.third().equals(estado)){
+                    resp = false;
+                    break;
+                }else{
+                    visitados.add(estado);
+                    if(!visitados.contains(element.third())){
+                        visitados.add(element.third());
+                        if(sucesoresContineEstado(visitados,element.third())){
+                            resp = true;
+                            break;
                         }
-                    }
+                    }else{
+                        resp = true;
+                        break;
+                    }    			
                 }
+            }
+        }
         return resp;
-	}
-        
-	/**
-	 * Returns a new automaton which recognizes the complementary
-	 * language. 
-	 * 
-	 * @returns a new DFA accepting the language's complement.
-	 */
+    }
+    
+    /** complemento():Returns a new automaton which recognizes the complementary language. 
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns a new DFA accepting the language's complement.
+    */
 	public DFA complement() {
 		assert rep_ok();
 		// TODO
@@ -350,14 +410,14 @@ public class DFA extends FA {
                 return complemento;		
 	}
 	
-	/**
-	 * Returns a new automaton which recognizes the kleene closure
-	 * of language. 
-	 * 
-	 * @returns a new DFA accepting the language's complement.
-	 */
-	public DFA star() {
-		assert rep_ok();
+    /** star():
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns DFA
+    */
+    public DFA star() {
+        assert rep_ok();
         Iterator<State> iterator_estados_finales = estados_finales.iterator();
         Set<Triple<State,Character,State>> new_transitions = new HashSet<Triple<State,Character,State>>();
         new_transitions.addAll(transiciones);
@@ -370,14 +430,16 @@ public class DFA extends FA {
 		return nfalambda.toDFA();
 	}
 	
-	/**
-	 * Returns a new automaton which recognizes the union of both
-	 * languages, the one accepted by 'this' and the one represented
-	 * by 'other'. 
-	 * 
-	 * @returns a new DFA accepting the union of both languages.
-	 */	
-	public DFA union(DFA other) {
+    
+    /** union(): Returns a new automaton which recognizes the union of both
+     * languages, the one accepted by 'this' and the one represented
+     * by 'other'. 
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns a new DFA accepting the union of both languages.
+    */
+    public DFA union(DFA other) {
 		assert rep_ok();
 		assert other.rep_ok();
 		// TODO	
@@ -420,18 +482,21 @@ public class DFA extends FA {
         DFA dfa = nfaLambda.toDFA();
         return dfa;
         }
-	
-	/**
-	 * Returns a new automaton which recognizes the intersection of both
-	 * languages, the one accepted by 'this' and the one represented
-	 * by 'other'. 
-	 * 
-	 * @returns a new DFA accepting the intersection of both languages.
-	 */	
-	public DFA intersection(DFA other) {
-		assert rep_ok();
-		assert other.rep_ok();
-		// TODO
+
+        
+    /** intersection():Returns a new automaton which recognizes the intersection of both
+     * languages, the one accepted by 'this' and the one represented
+     * by 'other'. 
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param other
+     * @returns a new DFA accepting the intersection of both languages.
+    */
+    public DFA intersection(DFA other) {
+            assert rep_ok();
+            assert other.rep_ok();
+            // TODO
 
         //renombro el automata other para que no me genere conflictos de nombres
         other = renombrar(other,'r');
@@ -472,8 +537,16 @@ public class DFA extends FA {
         // return (complement().union(other.complement())).complement();
 	}
    
-        //funcion que a base de un automata le renombra todos los estados, las transiciones, los estados finales y el estado inicial
-        //no remobra el arfabeto ya que no afecta al funcionamiento con otros automatas
+   /** renombrar(): Funcion que a base de un automata le renombra todos los 
+     * estados, las transiciones, los estados finales y el estado inicial
+     * no remobra el arfabeto ya que no afecta al funcionamiento con otros automatas
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param other
+     * @param a
+     * @returns DFA
+    */
         private DFA renombrar(DFA other, Character a){
             //Nuevo estado inicial
         	
@@ -513,20 +586,32 @@ public class DFA extends FA {
             return automata;
         }
         
-        
+      
+   /** rep_ok():
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns boolean
+    */
 	@Override
 	public boolean rep_ok() {
-		// TODO: Check that the alphabet does not contains lambda.
-		// TODO: Check that initial and final states are included in 'states'.
-		// TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
-		// TODO: Check that the transition relation is deterministic.              
-                if ((!alfabeto.contains('_')) && (estados.contains(inicial)) && (checkFinalStates()) && (checkTransition()) && (checkDeterministic())){
-                    return true;
-                }
-                return false;
+            // TODO: Check that the alphabet does not contains lambda.
+            // TODO: Check that initial and final states are included in 'states'.
+            // TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
+            // TODO: Check that the transition relation is deterministic.              
+            if ((!alfabeto.contains('_')) && (estados.contains(inicial)) && (checkFinalStates()) && (checkTransition()) && (checkDeterministic())){
+                return true;
+            }
+            return false;
 	}
 
-    //funcion que chequea que los estados finales enten dentro de los estados del automata
+    /** checkFinalStates(): Funcion que chequea que los estados finales enten 
+     * dentro de los estados del automata
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns boolean
+    */
     private boolean checkFinalStates() {
         Iterator<State> iterator = estados_finales.iterator();
         while (iterator.hasNext()){
@@ -537,8 +622,16 @@ public class DFA extends FA {
         return true;
     }
 
-    //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
-    // y chequea que el caracter este dentro del arfabeto    
+    
+    /** checkTransition(): Funcion que chequea que los estados de partida y de 
+     * llegada esten dentro del set de estados del automata 
+     * y chequea que el caracter este dentro del arfabeto    
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns boolean
+    */
+
     private boolean checkTransition() {
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
         while (iterator.hasNext()){
@@ -550,7 +643,14 @@ public class DFA extends FA {
         return true;
     }
 
-    //funcion que chequea que a base de un estado y un caracter no pueda ir a otro estado, o sea que sea un automata determinista
+    
+    /** checkDeterministic(): Funcion que chequea que a base de un estado y un 
+     * caracter no pueda ir a otro estado, o sea que sea un automata determinista
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns boolean
+    */
     private boolean checkDeterministic() {
         Set<Tuple<State,Character>> visitados = new HashSet<>();
         Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
@@ -565,7 +665,14 @@ public class DFA extends FA {
         return true;
     }
     
-    //funcion que retorna la minimizacion del automata corriente   
+    
+    /** minimizeDFA(): Funcion que retorna la minimizacion del automata corriente   
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param automat
+     * @returns DFA
+    */
     public DFA minimizeDFA (DFA automat){
         assert rep_ok();
         //creo la tabla de estados equivalentes en el cual en el primer elemento tengo la fila, 
@@ -672,7 +779,15 @@ public class DFA extends FA {
         return automata;
     }
     
-    //funcion que pasa de un set de estados a un arreglo de estados
+    
+    /** to_Array(): Funcion que pasa de un set de estados a un arreglo de estados
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param state
+     * @returns array de state
+    */
+
     private State[] to_Array(Set<State> state){
         
         Iterator <State> _st = state.iterator();
@@ -685,13 +800,31 @@ public class DFA extends FA {
             return array_state;
     }
     
-    //funcion que implementa el xor de booleanos
+    /** xor(): Funcion que implementa el xor de booleanos
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param x 
+     * @param y 
+     * @returns boolean
+    */
     private boolean xor(boolean x, boolean y){
         return ( ( x || y ) && ! ( x && y ) );
     }    
 
-    //obtiene el siguiente de estado_a y de estado_b con el caracter c y despues busca en la matriz la interseccion de esos dos estados siguientes 
-    //y se fija si hay una x si no hay entonces la interseccion estado_a y estado _b queda igual, si hay se le pone una x.
+    
+    /** deltaMin(): obtiene el siguiente de estado_a y de estado_b con el caracter c y despues busca en la matriz la interseccion de esos dos estados siguientes 
+     * y se fija si hay una x si no hay entonces la interseccion estado_a y estado _b queda igual, si hay se le pone una x.
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param c 
+     * @param estado_a 
+     * @param estado_b 
+     * @param matriz 
+     * @returns boolean
+    */
+    
     private boolean deltaMin(State estado_a, State estado_b, Character c, Triple[][] matriz){
         State estado1 = delta(estado_a, c);
         State estado2 = delta(estado_b, c);
@@ -724,7 +857,16 @@ public class DFA extends FA {
     }
         
    
-  //funcion  que retorna un booleano dependiendo si los dos automatas son equivalentes o iguales
+    
+    /** equalsAutomat(): Funcion  que retorna un booleano dependiendo si los 
+     * dos automatas son equivalentes o iguales
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param A
+     * @param B
+     * @returns boolean
+    */
    public boolean equalsAutomat(DFA A, DFA B){
        assert rep_ok();
        assert A.rep_ok();
@@ -811,12 +953,26 @@ public class DFA extends FA {
        return equals;
     }
 
+   /** getTransiciones(): Retorna el conjunto de tranciciones
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @returns transiciones
+    */
    public Set<Triple<State, Character, State>> getTransiciones() {
 	   return transiciones;
    }
    
-    //Lee la entrada estándar o una lista de archivos e 
-    //imprime las líneas que contengan coincidencias para la expresión regular. 
+   
+   /** grep(): Lee la entrada estándar o una lista de archivos e 
+    * imprime las líneas que contengan coincidencias para la expresión regular. 
+     * <li>pre: true </li>
+     * <li>post:  </li>
+     * <hr>
+     * @param path_file 
+     * @param regular_exp 
+     * @returns String
+    */
     public String grep(String regular_exp, String path_file) throws FileNotFoundException, IOException{
         assert rep_ok();
         assert (regular_exp != null);
@@ -855,7 +1011,15 @@ public class DFA extends FA {
         return result;
     }
     
-    //funcion que retorna una lista de string con todas los subString ordenado de un String
+    
+    /** sub_List(): Funcion que retorna una lista de string con todas los 
+     * subString ordenado de un String
+     * <li>pre: true </li>
+     * <li>post: Una lista que contiene sub listas </li>
+     * <hr>
+     * @param text
+     * @returns list
+    */
     private LinkedList<String> sub_List(String text){
         LinkedList<String> list = new LinkedList();
         for(int i = 0; i < text.length(); i++){
