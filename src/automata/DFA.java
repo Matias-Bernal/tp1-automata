@@ -831,13 +831,17 @@ public class DFA extends FA {
         
         String line = br.readLine();
         LinkedList<String> sub_String = new LinkedList();
-        sub_String = sub_List(line);
         while(line != null){
+            sub_String = sub_List(line);
             if(automata.accepts(line)){
-                result += line +"/n";
+                result += line + "/n";
+            }
+            for(int i=0; i<sub_String.size(); i++){
+                if(automata.accepts(sub_String.get(i))){
+                    result += line + "/n";
+                }
             }
             line = br.readLine();
-            sub_String = sub_List(line);
         }
         return result;
     }
