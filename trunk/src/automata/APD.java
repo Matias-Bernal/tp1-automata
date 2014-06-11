@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import utils.Quintuple;
 import utils.TadPilaDinPila;
+import utils.Triple;
 
 public class APD {
 
@@ -259,7 +260,7 @@ public class APD {
         assert rep_ok();
         assert string != null;
         assert verify_string(string);
-        if(string==""){
+        if(string.isEmpty()){
 			return estados_finales.contains(estado_inicial);
 		}else{
             State state = delta(estado_inicial, string.charAt(0));
@@ -288,7 +289,7 @@ public class APD {
 		    		   pila.desapilar();
 		    	   }
 	    		   if (elemento.length()==1){
-		    			   pila.apilar(elemento);//falta el caso "aa"   
+		    			   pila.apilar(elemento);   
 		    		   }else{
 		    			    for(int i=0;i<elemento.length();i++){
 		    			    	Character obj = elemento.charAt(i);
@@ -318,10 +319,40 @@ public class APD {
 	 * @return True iff the automaton is in a consistent state.
 	 */
 	public boolean rep_ok() {
-		// TODO Auto-generated method stub
-		return true;
+		// TODO: Check that the alphabet does not contains lambda.
+		// TODO: Check that initial and final states are included in 'states'.
+		// TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
+		// TODO: Check that the transition relation is deterministic.              
+        if ((!alfabeto.contains('_')) && (estados.contains(estado_inicial)) && (checkFinalStates()) && (checkTransition())){
+            return true;
+        }
+        return false;
 	}
 
+	
+    //funcion que chequea que los estados finales enten dentro de los estados del automata
+    private boolean checkFinalStates() {
+        Iterator<State> iterator = estados_finales.iterator();
+        while (iterator.hasNext()){
+            if (!estados.contains(iterator.next())){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
+    // y chequea que el caracter este dentro del arfabeto    
+    private boolean checkTransition() {
+        Iterator<Quintuple<State, Character, String, Character, State>> iterator = transiciones.iterator();
+        while (iterator.hasNext()){
+            Quintuple<State, Character, String, Character, State> element = iterator.next();        
+            if (!estados.contains(element.first()) ||  !alfabeto.contains(element.second()) || !alfabeto_pila.contains(element.fourth())|| !estados.contains(element.fifth())){
+                return false;
+            }
+        }
+        return true;
+    }
 
 	public Set<State> getEstados() {
 		return estados;
