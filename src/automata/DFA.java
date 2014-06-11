@@ -399,10 +399,10 @@ public class DFA extends FA {
         Set<State> union_finales = new HashSet<State>();
         union_finales.addAll(estados_finales);
 
-            
+        
         union_estados.addAll(other.states());
-            union_transitions.addAll(other.transiciones);
-            union_finales.addAll(other.final_states());
+        union_transitions.addAll(other.transiciones);
+        union_finales.addAll(other.final_states());
             
         //nuevo estado inicial "l0"
         State nuevo_inicial = new State("l0");
@@ -860,7 +860,7 @@ public class DFA extends FA {
         LinkedList<String> list = new LinkedList();
         for(int i = 0; i < text.length(); i++){
             for(int j = i; j < text.length(); j++){
-                list.add(text.substring(i, j));
+                list.add(text.substring(i, j+1));
             }
         }
         return list;
