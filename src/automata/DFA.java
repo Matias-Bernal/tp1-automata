@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+
+import utils.ExpresionRegular;
 import utils.Triple;
 import utils.Tuple;
 
@@ -474,8 +476,8 @@ public class DFA extends FA {
                 intTransitions.addAll(other.transiciones);
                 
                 //Creo un DFA de la interseccion como resultado.
-		DFA intersection = new DFA(intState, intAlphabet, intTransitions, inicial, other.final_states());
-		return intersection;		
+                DFA intersection = new DFA(intState, intAlphabet, intTransitions, inicial, other.final_states());
+                return intersection;		
 	}
    
         //funcion que a base de un automata le renombra todos los estados, las transiciones, los estados finales y el estado inicial
@@ -805,6 +807,10 @@ public class DFA extends FA {
        
        return equals;
     }
+
+   public Set<Triple<State, Character, State>> getTransiciones() {
+	   return transiciones;
+   }
    
     //Lee la entrada estándar o una lista de archivos e 
     //imprime las líneas que contengan coincidencias para la expresión regular. 
@@ -814,13 +820,14 @@ public class DFA extends FA {
         assert (path_file != null);
         
         //Con la expresion regular construyo el automata
-        DFA automata = regular_exp.toDFA();
+        ExpresionRegular er = new ExpresionRegular(regular_exp);
+        DFA automata = er.toDFA();
         
         String result = "";
        
         File file = new File (path_file);
-	FileReader fr = new FileReader (file);
-	BufferedReader br = new BufferedReader(fr);
+        FileReader fr = new FileReader (file);
+        BufferedReader br = new BufferedReader(fr);
         
         String line = br.readLine();
         LinkedList<String> sub_String = new LinkedList();

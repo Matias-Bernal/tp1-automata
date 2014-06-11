@@ -148,8 +148,8 @@ public class ExpresionRegular {
 	
 	public DFA toDFA(){
         this.expresion = expresion.concat("~"); // agregamos ~ como marca final
-        DFA automata = S();
-        return automata.minimizeDFA(automata);
+        //DFA automata = S();
+        return S();
 	}
 	
 	/*
