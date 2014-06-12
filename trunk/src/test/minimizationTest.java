@@ -28,7 +28,7 @@ public class minimizationTest {
         dfa_A = dfa_A.minimizeDFA();
         DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
         dfa_B = dfa_B.minimizeDFA();
-        assertTrue(dfa_A.equalsAutomat(dfa_A,dfa_B));
+        assertTrue(dfa_A.equalsAutomat(dfa_B));
     }
     
 }

@@ -867,16 +867,15 @@ public class DFA extends FA {
      * @param B
      * @returns boolean
     */
-   public boolean equalsAutomat(DFA A, DFA B){
+   public boolean equalsAutomat(DFA B){
        assert rep_ok();
-       assert A.rep_ok();
        assert B.rep_ok();
        
        boolean equals = true;
        
        //El mismo alfabeto
        Set<Character> alf_A = new HashSet<>();
-       alf_A.addAll(A.alfabeto);
+       alf_A.addAll(this.alfabeto);
        Iterator<Character> alphabet_A = alf_A.iterator();
        
        Set<Character> alf_B = new HashSet<>();
@@ -893,7 +892,7 @@ public class DFA extends FA {
        
        //Los mismos estados
        Set<State> st_A = new HashSet<>();
-       st_A.addAll(A.estados);
+       st_A.addAll(this.estados);
        Iterator<State> state_A = st_A.iterator();
        
        Set<State> st_B = new HashSet<>();
@@ -910,7 +909,7 @@ public class DFA extends FA {
        
        //El mismo numero de transiciones y si las transiciones son las mismas
        Set<Triple<State,Character,State>> transit_A = new HashSet<>();
-       transit_A.addAll(A.transiciones);
+       transit_A.addAll(this.transiciones);
        Iterator<Triple<State,Character,State>> transitions_A = transit_A.iterator();
        
        Set<Triple<State,Character,State>> transit_B = new HashSet<>();
@@ -929,7 +928,7 @@ public class DFA extends FA {
        
        //Los mismos estados finales
        Set<State> st_final_A = new HashSet<>();
-       st_final_A.addAll(A.estados_finales);
+       st_final_A.addAll(this.estados_finales);
        Iterator<State> state_final_A = st_final_A.iterator();
        
        Set<State> st_final_B = new HashSet<>();
@@ -946,7 +945,7 @@ public class DFA extends FA {
        
        //El mismo estado inicial
        
-       if(A.inicial.equals(B.inicial)){
+       if(this.inicial.equals(B.inicial)){
            equals = false;
        }
        
