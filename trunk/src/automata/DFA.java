@@ -2,7 +2,6 @@ package automata;
 
 import java.io.*;
 import java.util.*;
-
 import utils.ExpresionRegular;
 import utils.Triple;
 import utils.Tuple;
@@ -670,7 +669,6 @@ public class DFA extends FA {
      * <li>pre: true </li>
      * <li>post:  </li>
      * <hr>
-     * @param automat
      * @returns DFA
     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -727,8 +725,17 @@ public class DFA extends FA {
         
         // empieza la creacion del automata a partir de la tabla de estados equivalentes
         Set<Triple<State,Character,State>> _transitions = new HashSet<Triple<State,Character,State>>();
+        //empiezo a renombrar las apariciones de los estados en las transiciones
+        _transitions.addAll(transiciones);
+        
         Set<State> _state_final = new HashSet<State>();
+        //renombro las apariciones de los estados en los estados finales
+        _state_final.addAll(this.estados_finales);
+        
         Set<State> _state = new HashSet<State>();
+        //renombro las apariciones de los estados en el set de estados
+        _state.addAll(this.estados);
+        
         //recorro todas las filas
         for(int i=0; i<min.length; i++){
             //recorro todas las columnas
@@ -739,8 +746,7 @@ public class DFA extends FA {
                     //creo el nuevo estado que contendra el nombre de ambos
                     State _new = new State((((State)min[i][j].first()).name())+(((State)min[i][j].second()).name()));
                     
-                    //empiezo a renombrar las apariciones de los estados en las transiciones
-                    _transitions.addAll(transiciones);
+                    
                     Iterator <Triple<State,Character,State>> _trans = _transitions.iterator();
                     while(_trans.hasNext()){
                         Triple<State,Character,State> corriente = _trans.next();
@@ -751,8 +757,7 @@ public class DFA extends FA {
                         }
                     }
                     
-                    //renombro las apariciones de los estados en los estados finales
-                    _state_final.addAll(this.estados_finales);
+                    
                     Iterator <State> _state_fnl = _state_final.iterator();
                     while(_state_fnl.hasNext()){
                         State corriente = _state_fnl.next();
@@ -762,8 +767,7 @@ public class DFA extends FA {
                         }
                     }
                     
-                    //renombro las apariciones de los estados en el set de estados
-                    _state.addAll(this.estados);
+                    
                     Iterator <State> _st = _state.iterator();
                     while(_st.hasNext()){
                         State corriente = _st.next();
@@ -777,7 +781,7 @@ public class DFA extends FA {
         }
         //creo el automata resultante de la minimizacion
         DFA automata = new DFA(_state,this.alfabeto,_transitions,this.inicial, _state_final);
-        return automata;
+        return automata;  
     }
     
     
