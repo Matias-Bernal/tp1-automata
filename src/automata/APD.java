@@ -35,6 +35,12 @@ public class APD {
 	public static final Character Lambda = '_';
 	public static final Character Simbolo_Inicial = '@';
 
+        /**
+         * APD()
+         * @param path_file
+         * @throws IllegalArgumentException
+         * @throws IOException 
+         */
 	@SuppressWarnings("resource")
 	public APD(String path_file) throws IllegalArgumentException, IOException {	
 		//Abrir el archivo
@@ -218,6 +224,10 @@ public class APD {
 	 *	State querying 
 	 */
 
+        /**
+         * to_dot()
+         * @param file_name 
+         */
 	public void to_dot(String file_name) {
 		assert rep_ok();
 		assert !(transiciones.isEmpty());
@@ -255,7 +265,11 @@ public class APD {
 		}
 	}
 	
-	
+	/**
+         * accept_by_final_state()
+         * @param string
+         * @return 
+         */
 	public boolean accept_by_final_state(String string) {
         assert rep_ok();
         assert string != null;
@@ -272,65 +286,81 @@ public class APD {
             return estados_finales.contains(state);
 		}
 	}
-	
-	private State delta(State estado, Character caracter) {
-		assert estados.contains(estado);
-		assert alfabeto.contains(caracter);
-	    assert !(transiciones.isEmpty());
-	    Iterator<Quintuple<State, Character, String, Character, State>> iterator = transiciones.iterator();    
-	    while (iterator.hasNext()){
-	       Quintuple<State, Character, String, Character, State> element = iterator.next();
-	       if (element.first().name().equals(estado.name()) && element.second().equals(caracter) && pila.tope().toString().equals(element.fourth().toString())){
-	    	   String elemento = element.third();
-	    	   if(elemento.toString().equals(Lambda.toString())){
-	    		   pila.desapilar();
-	    	   }else{
-	    		   if(!pila.tope().equals(Simbolo_Inicial)){
-		    		   pila.desapilar();
-		    	   }
-	    		   if (elemento.length()==1){
-		    			   pila.apilar(elemento);   
-		    		   }else{
-		    			    for(int i=0;i<elemento.length();i++){
-		    			    	Character obj = elemento.charAt(i);
-		    			    	pila.apilar(obj);
-		    			    }
-		    		   }
-		    	   }
-	           return element.fifth();
-	       }
-	    }
-	    return null;
-	}
+        
+    /**
+    * delta()
+    * @param estado
+    * @param caracter
+    * @return 
+    */
+    private State delta(State estado, Character caracter) {
+        assert estados.contains(estado);
+        assert alfabeto.contains(caracter);
+        assert !(transiciones.isEmpty());
+        Iterator<Quintuple<State, Character, String, Character, State>> iterator = transiciones.iterator();    
+        while (iterator.hasNext()){
+            Quintuple<State, Character, String, Character, State> element = iterator.next();
+            if (element.first().name().equals(estado.name()) && element.second().equals(caracter) && pila.tope().toString().equals(element.fourth().toString())){
+                String elemento = element.third();
+                if(elemento.toString().equals(Lambda.toString())){
+                    pila.desapilar();
+                }else{
+                    if(!pila.tope().equals(Simbolo_Inicial)){
+                        pila.desapilar();
+                    }
+                    if (elemento.length()==1){
+                        pila.apilar(elemento);   
+                    }else{
+                        for(int i=0;i<elemento.length();i++){
+                            Character obj = elemento.charAt(i);
+                            pila.apilar(obj);
+                        }
+                    }
+                }
+                return element.fifth();
+            }
+        }
+        return null;
+    }
 
-	public boolean verify_string(String s) {
-		boolean res = true;
-		for(int i=0;i<s.length();i++){
-			if(!alfabeto.contains(s.charAt(i))){
-				res = false;
-				break;
-			}
-				
-		}
-		return res;
-	}
 
-	/**
-	 * @return True iff the automaton is in a consistent state.
-	 */
-	public boolean rep_ok() {
-		// TODO: Check that the alphabet does not contains lambda.
-		// TODO: Check that initial and final states are included in 'states'.
-		// TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
-		// TODO: Check that the transition relation is deterministic.              
+    /**
+    * verify_string()
+    * @param s
+    * @return 
+    */
+    public boolean verify_string(String s) {
+        boolean res = true;
+        for(int i=0;i<s.length();i++){
+            if(!alfabeto.contains(s.charAt(i))){
+                res = false;
+                break;
+            }
+			
+        }
+            return res;
+    }
+
+    /**
+    * @return True iff the automaton is in a consistent state.
+    */
+    public boolean rep_ok() {
+        // TODO: Check that the alphabet does not contains lambda.
+        // TODO: Check that initial and final states are included in 'states'.
+        // TODO: Check that all transitions are correct. All states and characters should be part of the automaton set of states and alphabet.
+        // TODO: Check that the transition relation is deterministic.              
         if ((!alfabeto.contains('_')) && (estados.contains(estado_inicial)) && (checkFinalStates()) && (checkTransition())){
             return true;
         }
         return false;
-	}
+    }
 
 	
-    //funcion que chequea que los estados finales enten dentro de los estados del automata
+    
+    /**
+     * checkFinalStates(): funcion que chequea que los estados finales enten dentro de los estados del automata
+     * @return 
+     */    
     private boolean checkFinalStates() {
         Iterator<State> iterator = estados_finales.iterator();
         while (iterator.hasNext()){
@@ -341,8 +371,12 @@ public class APD {
         return true;
     }
 
-    //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
-    // y chequea que el caracter este dentro del arfabeto    
+    
+    /**
+     * checkTransition(): Funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
+     * y chequea que el caracter este dentro del arfabeto    
+     * @return 
+     */
     private boolean checkTransition() {
         Iterator<Quintuple<State, Character, String, Character, State>> iterator = transiciones.iterator();
         while (iterator.hasNext()){
@@ -354,74 +388,74 @@ public class APD {
         return true;
     }
 
-	public Set<State> getEstados() {
-		return estados;
-	}
+    public Set<State> getEstados() {
+            return estados;
+    }
 
 
-	public void setEstados(Set<State> estados) {
-		this.estados = estados;
-	}
+    public void setEstados(Set<State> estados) {
+            this.estados = estados;
+    }
 
 
-	public Set<Character> getAlfabeto() {
-		return alfabeto;
-	}
+    public Set<Character> getAlfabeto() {
+            return alfabeto;
+    }
 
 
-	public void setAlfabeto(Set<Character> alfabeto) {
-		this.alfabeto = alfabeto;
-	}
+    public void setAlfabeto(Set<Character> alfabeto) {
+            this.alfabeto = alfabeto;
+    }
 
 
-	public Set<Character> getAlfabeto_pila() {
-		return alfabeto_pila;
-	}
+    public Set<Character> getAlfabeto_pila() {
+            return alfabeto_pila;
+    }
 
 
-	public void setAlfabeto_pila(Set<Character> alfabeto_pila) {
-		this.alfabeto_pila = alfabeto_pila;
-	}
+    public void setAlfabeto_pila(Set<Character> alfabeto_pila) {
+        this.alfabeto_pila = alfabeto_pila;
+    }
 
 
-	public Set<Quintuple<State, Character, String, Character, State>> getTransiciones() {
-		return transiciones;
-	}
+    public Set<Quintuple<State, Character, String, Character, State>> getTransiciones() {
+        return transiciones;
+    }
 
 
-	public void setTransiciones(
-			Set<Quintuple<State, Character, String, Character, State>> transiciones) {
-		this.transiciones = transiciones;
-	}
+    public void setTransiciones(
+        Set<Quintuple<State, Character, String, Character, State>> transiciones) {
+        this.transiciones = transiciones;
+    }
 
 
-	public State getEstado_inicial() {
-		return estado_inicial;
-	}
+    public State getEstado_inicial() {
+            return estado_inicial;
+    }
 
 
-	public void setEstado_inicial(State estado_inicial) {
-		this.estado_inicial = estado_inicial;
-	}
+    public void setEstado_inicial(State estado_inicial) {
+            this.estado_inicial = estado_inicial;
+    }
 
 
-	public Set<State> getEstados_finales() {
-		return estados_finales;
-	}
+    public Set<State> getEstados_finales() {
+        return estados_finales;
+    }
 
 
-	public void setEstados_finales(Set<State> estados_finales) {
-		this.estados_finales = estados_finales;
-	}
+    public void setEstados_finales(Set<State> estados_finales) {
+            this.estados_finales = estados_finales;
+    }
 
 
-	public TadPilaDinPila getPila() {
-		return pila;
-	}
+    public TadPilaDinPila getPila() {
+        return pila;
+    }
 
 
-	public void setPila(TadPilaDinPila pila) {
-		this.pila = pila;
-	}
+    public void setPila(TadPilaDinPila pila) {
+        this.pila = pila;
+    }
 	
 }
