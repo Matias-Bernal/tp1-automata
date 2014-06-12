@@ -708,7 +708,7 @@ public class DFA extends FA {
                     if(min[i][j].third()==""){
                         //busca la interseccion de todo los estados siguientes con todo el alfabeto
                         Iterator<Character> iterator_aphabet = alfabeto.iterator();
-                        while(!result || iterator_aphabet.hasNext()){
+                        while(!result && iterator_aphabet.hasNext()){
                             Character _char = iterator_aphabet.next();
                             result = deltaMin((State)min[i][j].first(),(State)min[i][j].second(),_char,min);
                         }
@@ -838,23 +838,23 @@ public class DFA extends FA {
         int i = 0;
         
         //recorro las filas en busca de la fila estado1
-        while((i<matriz.length) && (matriz[i][j].first()!= estado1)){
+        while((i<matriz.length-1) && (matriz[i][j].first()!= estado1)){
             i++;
         }
         //una vez que ya encontre la fila estado1 busco la columna estado2
-        while(j<matriz.length && matriz[i][j]!=null && matriz[i][j].second() != estado2){
+        while(j<matriz.length-1 && matriz[i][j]!=null && matriz[i][j].second() != estado2){
             j++;
         }
         //si no encontre la interseccion fila estado1 y columna estado2, intercambio la fila por la columna y busco de nuevo
-        if(j==matriz.length || matriz[i][j]==null){
+        if(j==matriz.length-1 || matriz[i][j]==null){
             i = 0;
             j = 0;
             //recorro las filas en busca de la fila estado2
-            while((i<matriz.length) && (matriz[i][j].first()!= estado2)){
+            while((i<matriz.length-1) && (matriz[i][j].first()!= estado2)){
                 i++;
             }
             //una vez que ya encontre la fila estado2 busco la columna estado1
-            while(j<matriz.length && matriz[i][j]!=null && matriz[i][j].second() != estado1){
+            while(j<matriz.length-1 && matriz[i][j]!=null && matriz[i][j].second() != estado1){
                 j++;
             }
         }
@@ -890,58 +890,59 @@ public class DFA extends FA {
        boolean equals = true;
        
        //El mismo alfabeto
-       Set<Character> alf_A = new HashSet<>();
-       alf_A.addAll(this.alfabeto);
-       Iterator<Character> alphabet_A = alf_A.iterator();
-       
-       Set<Character> alf_B = new HashSet<>();
-       alf_B.addAll(B.alfabeto);
-       Iterator<Character> alphabet_B = alf_B.iterator();
-       
-       while(alphabet_A.hasNext() && alphabet_B.hasNext() && equals){
-           Character current_A = alphabet_A.next();
-           Character current_B = alphabet_B.next();
-           if(!current_A.equals(current_B)){
-               equals = false;
-           }
+       if (alfabeto.size()!=B.alfabeto.size()){
+    	   return false;
+       }else{
+    	   Iterator<Character> alphabet_A = alfabeto.iterator();
+    	   while(alphabet_A.hasNext()){
+    		   Character current_A = alphabet_A.next();
+    		   if (!B.alfabeto.contains(current_A)){
+    			   return false;
+    		   }
+    	   }
        }
-       
        //Los mismos estados
-       Set<State> st_A = new HashSet<>();
-       st_A.addAll(this.estados);
-       Iterator<State> state_A = st_A.iterator();
-       
-       Set<State> st_B = new HashSet<>();
-       st_B.addAll(B.estados);
-       Iterator<State> state_B = st_B.iterator();
-       
-       while(state_A.hasNext() && state_B.hasNext() && equals){
-           State current_A = state_A.next();
-           State current_B = state_B.next();
-           if(!current_A.equals(current_B)){
-               equals = false;
-           }
+       if (estados.size()!= B.estados.size()){
+    	   return false;
+       }else{
+    	   Iterator<State> state_A = estados.iterator();
+    	   while(state_A.hasNext()){
+    		   Iterator<State> state_B = B.estados.iterator();
+    		   State current_A = state_A.next();
+    		   boolean existe = false;
+    		   while (state_B.hasNext()){
+    			   State current_B = state_B.next();    			   
+    			   if(current_A.name().equals(current_B.name())){
+    				   existe = true;
+    				   break;
+    			   }
+    		   }
+    		   if(!existe)
+    			   return false;
+    	   }  
        }
        
        //El mismo numero de transiciones y si las transiciones son las mismas
-       Set<Triple<State,Character,State>> transit_A = new HashSet<>();
-       transit_A.addAll(this.transiciones);
-       Iterator<Triple<State,Character,State>> transitions_A = transit_A.iterator();
-       
-       Set<Triple<State,Character,State>> transit_B = new HashSet<>();
-       transit_B.addAll(B.transiciones);
-       Iterator<Triple<State,Character,State>> transitions_B = transit_B.iterator();
-       if(!transit_A.containsAll(transit_B)){
-           equals = false;
+       if (transiciones.size()!= B.transiciones.size()){
+    	   return false;
+       }else{
+    	   Iterator<Triple<State,Character,State>> transitions_A = transiciones.iterator();
+    	   while(transitions_A.hasNext()){
+    		   Triple<State,Character,State> current_A = transitions_A.next();    		   
+    		   Iterator<Triple<State,Character,State>> transitions_B = B.transiciones.iterator();
+    		   while(transitions_B.hasNext()){
+    			   Triple<State,Character,State> current_B = transitions_B.next();
+    			   boolean existe = false;
+    			   if(current_A.first().name().equals(current_B.first().name()) && current_A.second().equals(current_B.second()) && current_A.third().name().equals(current_B.third().name())){
+    				   existe = true;
+    				   break;
+    			   }
+    			   if(!existe)
+    				   return false;
+    		   }
+    	   }
        }
-       while(transitions_A.hasNext() && transitions_B.hasNext() && equals){
-            Triple<State,Character,State> current_A = transitions_A.next();
-            Triple<State,Character,State> current_B = transitions_B.next();
-            if(!(current_A.equals(current_B) && current_A.second().equals(current_B.second()))){
-                equals = false;
-            }
-       }
-       
+              
        //Los mismos estados finales
        Set<State> st_final_A = new HashSet<>();
        st_final_A.addAll(this.estados_finales);
@@ -961,7 +962,7 @@ public class DFA extends FA {
        
        //El mismo estado inicial
        
-       if(this.inicial.equals(B.inicial)){
+       if(this.inicial.name().equals(B.inicial.name())){
            equals = false;
        }
        
