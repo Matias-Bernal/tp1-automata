@@ -4,23 +4,18 @@
  */
 package test;
 
-import static org.junit.Assert.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import utils.Triple;
 import automata.DFA;
 import automata.FA;
-import automata.State;
 
 /**
  *
  * @author gaston
  */
-public class equalsLanguagesTest {
+public class EqualsLanguagesTest {
     
      @Test
     public void test1() throws Exception {

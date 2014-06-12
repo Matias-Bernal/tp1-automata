@@ -673,7 +673,8 @@ public class DFA extends FA {
      * @param automat
      * @returns DFA
     */
-    public DFA minimizeDFA (){
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public DFA minimizeDFA (){
         assert rep_ok();
         //creo la tabla de estados equivalentes en el cual en el primer elemento tengo la fila, 
         //en el segundo la columna y en el tercero si son equivalentes los estados
@@ -825,7 +826,8 @@ public class DFA extends FA {
      * @returns boolean
     */
     
-    private boolean deltaMin(State estado_a, State estado_b, Character c, Triple[][] matriz){
+    @SuppressWarnings("rawtypes")
+	private boolean deltaMin(State estado_a, State estado_b, Character c, Triple[][] matriz){
         State estado1 = delta(estado_a, c);
         State estado2 = delta(estado_b, c);
         int j = 0;
@@ -1030,7 +1032,7 @@ public class DFA extends FA {
      * @returns list
     */
     private LinkedList<String> sub_List(String text){
-        LinkedList<String> list = new LinkedList();
+        LinkedList<String> list = new LinkedList<String>();
         for(int i = 0; i < text.length(); i++){
             for(int j = i; j < text.length(); j++){
                 list.add(text.substring(i, j+1));

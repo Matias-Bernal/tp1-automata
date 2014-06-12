@@ -4,23 +4,19 @@
  */
 package test;
 
-import static org.junit.Assert.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import utils.Triple;
 import automata.DFA;
 import automata.FA;
-import automata.State;
 
 /**
  *
  * @author gaston
  */
-public class minimizationTest {
+public class MinimizationTest {
     
     @Test
     public void test1() throws Exception {
@@ -53,7 +49,7 @@ public class minimizationTest {
         DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
         dfa_A = dfa_A.minimizeDFA();
         DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
-        assertFalse(dfa_A.accepts("hola") == dfa_B.accepts("hola"));
+        assertTrue(dfa_A.accepts("hola") == dfa_B.accepts("hola"));
     }
     
     @Test

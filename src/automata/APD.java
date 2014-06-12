@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import utils.Quintuple;
 import utils.TadPilaDinPila;
-import utils.Triple;
 
 public class APD {
 
