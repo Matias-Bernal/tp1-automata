@@ -63,4 +63,13 @@ public class minimizationTest {
         DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa4.dot");
         assertTrue(dfa_A.accepts("automatas") == dfa_B.accepts("automatas"));
     }   
+    
+    @Test
+    public void test6() throws Exception {
+        DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa3.dot");            
+        dfa_A = dfa_A.minimizeDFA();
+        DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa3.dot");
+        assertTrue(dfa_A.accepts("bb") == dfa_B.accepts("bb"));
+    }   
+    
 }

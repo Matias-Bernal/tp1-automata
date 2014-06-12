@@ -22,13 +22,13 @@ import automata.State;
  */
 public class equalsLanguagesTest {
     
-    @Test
+     @Test
     public void test1() throws Exception {
-        static DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
-        
+        DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
+        dfa_A = dfa_A.minimizeDFA();
         DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
-        
-        assertTrue();
+        dfa_B = dfa_B.minimizeDFA();
+        assertTrue(dfa_A.equalsAutomat(dfa_B));
     }
-    
+     
 }

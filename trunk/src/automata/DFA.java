@@ -856,7 +856,17 @@ public class DFA extends FA {
         return matriz[i][j].third()=="x";
     }
         
-   
+    /**
+     * 
+     * @param automat
+     * @return 
+     */
+    public boolean equalsLenguage(DFA automat){
+        DFA _this = this.minimizeDFA();
+        DFA _automat = automat.minimizeDFA();
+        return _this.equalsAutomat(_automat);
+    }
+    
     
     /** equalsAutomat(): Funcion  que retorna un booleano dependiendo si los 
      * dos automatas son equivalentes o iguales
