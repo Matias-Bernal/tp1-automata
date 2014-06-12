@@ -22,4 +22,13 @@ import automata.State;
  */
 public class equalsLanguagesTest {
     
+    @Test
+    public void test1() throws Exception {
+        static DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
+        
+        DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
+        
+        assertTrue();
+    }
+    
 }
