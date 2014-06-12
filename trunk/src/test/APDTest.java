@@ -1,17 +1,11 @@
 package test;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import utils.Triple;
 import automata.APD;
-import automata.DFA;
-import automata.State;
 
 public class APDTest {
 
