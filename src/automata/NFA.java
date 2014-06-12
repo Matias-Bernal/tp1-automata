@@ -6,11 +6,16 @@ import utils.Triple;
 
 public class NFA extends FA {
 
-	/*
-	 *  Construction
-	*/
-	
-	// Constructor
+
+        /**
+         * NFA():Constructor de la clase NFA
+         * @param states
+         * @param alphabet
+         * @param transitions
+         * @param initial
+         * @param final_states
+         * @throws IllegalArgumentException 
+         */
 	public NFA(	Set<State> states,
 			Set<Character> alphabet,
 			Set<Triple<State,Character,State>> transitions,
@@ -63,7 +68,14 @@ public class NFA extends FA {
 		return this.estados_finales;
 	}
 
-        //funcion que retorna un conjunto de estados alcanzables desde un estado from a travez de un caracter c
+        
+        /**
+         * delta(): funcion que retorna un conjunto de estados alcanzables 
+         * desde un estado from a travez de un caracter c
+         * @param from
+         * @param c
+         * @return 
+         */
 	@Override
 	public Set<State> delta(State from, Character c) {
 		assert states().contains(from);
@@ -81,7 +93,11 @@ public class NFA extends FA {
 		return result;
 	}
 	
-        //funcion que traduce un NFA al formato dot para luego ser impreso
+        
+        /**
+         * to_dot():funcion que traduce un NFA al formato dot para luego ser impreso
+         * @return 
+         */
 	@Override
 	public String to_dot() {
 		assert rep_ok();
@@ -111,7 +127,12 @@ public class NFA extends FA {
 	 *  Automata methods
 	*/	
 	
-	//metodo de acceptacion de una cadena en un NFA
+	
+        /**
+         * accepts():metodo de acceptacion de una cadena en un NFA
+         * @param string
+         * @return boolean
+         */
 	@Override
 	public boolean accepts(String string) {
 		assert rep_ok();
@@ -152,7 +173,13 @@ public class NFA extends FA {
 		}
 	}
         
-    //Funcion que devuelve un set de estados que se alcanzan desde otro set de estados apartir de un caracter   
+    /**
+     * deltaSet():Funcion que devuelve un set de estados que se alcanzan 
+     * desde otro set de estados apartir de un caracter   
+     * @param from
+     * @param c
+     * @return Conjunto de estados
+     */
     public Set<State> deltaSet(Set<State> from, Character c) {
         assert states().containsAll(from);
         assert alphabet().contains(c);
@@ -169,7 +196,13 @@ public class NFA extends FA {
         return result;	
     }
         
-    //funcion que cheque si un set contiene por lo menos un estado final
+    
+    /**
+     * containFinal():funcion que cheque si un set contiene por lo menos un estado final
+     * @param states
+     * @param finals
+     * @return 
+     */
     private boolean containFinal(Set<State> states, Set<State> finals){
         Iterator<State> iterator = states.iterator();
         while(iterator.hasNext()){
@@ -198,7 +231,10 @@ public class NFA extends FA {
 	}
 
 
-	
+	/**
+         * 
+         * @return true si la estructura es correcta
+         */
 	@Override
 	public boolean rep_ok() {
 		// TODO: Check that the alphabet does not contains lambda.
@@ -210,7 +246,12 @@ public class NFA extends FA {
                 return false;
 	} 
 
-        //funcion que chequea que los estados finales enten dentro de los estados del automata
+        
+        /**
+         * checkFinalStates():funcion que chequea que los estados finales 
+         * enten dentro de los estados del automata
+         * @return 
+         */
         private boolean checkFinalStates() {
             Iterator<State> iterator = estados_finales.iterator();
             while (iterator.hasNext()){
@@ -221,8 +262,12 @@ public class NFA extends FA {
             return true;
         }
        
-        //funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
-        // y chequea que el caracter este dentro del arfabeto.
+        
+        /**
+         * checkTransition(): funcion que chequea que los estados de partida y de llegada esten dentro del set de estados del automata 
+         * y chequea que el caracter este dentro del arfabeto.
+         * @return 
+         */
         private boolean checkTransition() {
             Iterator<Triple<State,Character,State>> iterator = transiciones.iterator();
             while (iterator.hasNext()){

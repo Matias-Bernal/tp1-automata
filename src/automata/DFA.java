@@ -673,7 +673,7 @@ public class DFA extends FA {
      * @param automat
      * @returns DFA
     */
-    public DFA minimizeDFA (DFA automat){
+    public DFA minimizeDFA (){
         assert rep_ok();
         //creo la tabla de estados equivalentes en el cual en el primer elemento tengo la fila, 
         //en el segundo la columna y en el tercero si son equivalentes los estados
