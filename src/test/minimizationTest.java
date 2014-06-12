@@ -31,4 +31,29 @@ public class minimizationTest {
         assertTrue(dfa_A.equalsAutomat(dfa_B));
     }
     
+    @Test
+    public void test2() throws Exception {
+        DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
+        dfa_A = dfa_A.minimizeDFA();
+        DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
+        dfa_B = dfa_B.minimizeDFA();
+        assertFalse(dfa_A.equalsAutomat(dfa_B));
+    }
+    
+    @Test
+    public void test3() throws Exception {
+        DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
+        dfa_A = dfa_A.minimizeDFA();
+        DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
+        assertTrue(dfa_A.accepts("") == dfa_B.accepts(""));
+    }
+    
+    @Test
+    public void test4() throws Exception {
+        DFA dfa_A = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
+        dfa_A = dfa_A.minimizeDFA();
+        DFA dfa_B = (DFA) FA.parse_form_file("src/test/dfa4.dot");            
+        assertFalse(dfa_A.accepts("hola") == dfa_B.accepts("hola"));
+    }
+    
 }
