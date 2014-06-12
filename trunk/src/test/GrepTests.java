@@ -7,6 +7,9 @@ import org.junit.Test;
 import automata.DFA;
 import automata.FA;
 
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
 public class GrepTests {
 
 	@Test
@@ -28,7 +31,7 @@ public class GrepTests {
     public void test3() throws Exception {
         DFA dfa = (DFA) FA.parse_form_file("src/test/dfa2.dot");            
         String prueba = dfa.grep( "((((f.e).l).i).z)", "src/test/prueba.txt");
-        String linea = "hindú comía feliz "+ "/n";
+        String linea = "hindï¿½ comï¿½a feliz "+ "/n";
         assertTrue(prueba.equals(linea));
     }
 	

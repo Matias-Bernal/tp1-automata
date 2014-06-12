@@ -6,11 +6,10 @@ package test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
-
 import automata.DFA;
 import automata.FA;
+import org.junit.Test;
 
 /**
  *
