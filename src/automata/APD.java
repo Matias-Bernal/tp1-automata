@@ -27,6 +27,8 @@ public class APD {
     Set<State> estados;		
     Set<Character> alfabeto;
     Set<Character> alfabeto_pila;
+    // la quintupla reprensenta <DesdeEstado,a del alfabeto, s que debe hacer el la pila,
+    // X del alfabeto_pila, HastaEstado>
     Set<Quintuple<State,Character,String,Character,State>> transiciones;		
     State estado_inicial;
     Set<State> estados_finales;

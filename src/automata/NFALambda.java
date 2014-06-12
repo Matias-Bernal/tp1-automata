@@ -243,31 +243,6 @@ public class NFALambda extends FA {
 		}
 		
 		return result;
-		
-//		
-//		Iterator<State> iteratorState = estado.iterator();
-//		Iterator<Triple<State,Character,State>> iteratorTrasitions = transiciones.iterator();
-//		while (iteratorState.hasNext()){
-//			State element = iteratorState.next();
-//			while (iteratorTrasitions.hasNext()){
-//				Triple<State,Character,State> transition = iteratorTrasitions.next();
-//				if(transition.first().equals(element) && transition.second().equals(Lambda)){
-//					if (!result.contains(transition.third())){
-//						result.add(transition.third());
-//						Set<State> aux = new HashSet<State>();
-//						aux.add(transition.third());
-//						Set<State> aux2 = clausura_lambda(aux);
-//						Iterator<State> iteratorAux = aux2.iterator();
-//						while (iteratorAux.hasNext()){
-//							State elementAux = iteratorAux.next();
-//							if (!result.contains(elementAux))
-//								result.add(elementAux);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		return result;
 	}
 	
 	public Set<State> mover (Set<State> estado, Character a){
@@ -285,17 +260,6 @@ public class NFALambda extends FA {
 		}
 		return clausura_lambda(result);
 	}
-			
-//			Set<State> aux = delta(element,a);
-//			Iterator<State> iteratorAux = aux.iterator();
-//			while (iteratorAux.hasNext()){
-//				State elementaux = iteratorAux.next();
-//				if(!result.contains(elementaux))
-//					result.add(elementaux);
-//			}
-//		}
-//		return result;
-//	}
 	
 	/**
 	 * Converts the automaton to a DFA.

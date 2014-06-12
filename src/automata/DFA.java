@@ -236,7 +236,7 @@ public class DFA extends FA {
                 }
             }
         }
-        return true;
+        return false;
 	}
    
         
