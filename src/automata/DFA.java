@@ -859,7 +859,7 @@ public class DFA extends FA {
     }
         
     /**
-     * 
+     * equalsLenguage()
      * @param automat
      * @return 
      */
