@@ -12,10 +12,6 @@ import org.junit.Test;
 import automata.DFA;
 import automata.FA;
 
-/**
- *
- * @author gaston
- */
 public class MinimizationTest {
     
     @Test
