@@ -885,10 +885,7 @@ public class DFA extends FA {
     */
    public boolean equalsAutomat(DFA B){
        assert rep_ok();
-       assert B.rep_ok();
-       
-       boolean equals = true;
-       
+       assert B.rep_ok();       
        //El mismo alfabeto
        if (alfabeto.size()!=B.alfabeto.size()){
     	   return false;
@@ -930,43 +927,43 @@ public class DFA extends FA {
     	   while(transitions_A.hasNext()){
     		   Triple<State,Character,State> current_A = transitions_A.next();    		   
     		   Iterator<Triple<State,Character,State>> transitions_B = B.transiciones.iterator();
+    		   boolean existe = false;
     		   while(transitions_B.hasNext()){
     			   Triple<State,Character,State> current_B = transitions_B.next();
-    			   boolean existe = false;
     			   if(current_A.first().name().equals(current_B.first().name()) && current_A.second().equals(current_B.second()) && current_A.third().name().equals(current_B.third().name())){
     				   existe = true;
     				   break;
     			   }
-    			   if(!existe)
-    				   return false;
     		   }
+    		   if(!existe)
+    			   return false;
     	   }
        }
-              
        //Los mismos estados finales
-       Set<State> st_final_A = new HashSet<>();
-       st_final_A.addAll(this.estados_finales);
-       Iterator<State> state_final_A = st_final_A.iterator();
-       
-       Set<State> st_final_B = new HashSet<>();
-       st_final_B.addAll(B.estados_finales);
-       Iterator<State> state_final_B = st_final_B.iterator();
-       
-       while(state_final_A.hasNext() && state_final_B.hasNext() && equals){
-           State current_A = state_final_A.next();
-           State current_B = state_final_B.next();
-           if(!current_A.equals(current_B)){
-               equals = false;
-           }
+       if (estados_finales.size()!= B.estados_finales.size()){
+    	   return false;
+       }else{
+    	   Iterator<State> state_final_A = estados_finales.iterator();
+    	   while(state_final_A.hasNext()){
+    		   State current_A = state_final_A.next();
+    		   Iterator<State> state_final_B = B.estados_finales.iterator();
+    		   boolean existe = false;
+    		   while(state_final_B.hasNext()){
+    			   State current_B = state_final_B.next();
+    			   if(current_A.name().equals(current_B.name())){
+    				   existe = true;
+    				   break;
+    			   }
+    		   }
+    		   if(!existe)
+    			   return false;
+    	   }
        }
-       
        //El mismo estado inicial
-       
-       if(this.inicial.name().equals(B.inicial.name())){
-           equals = false;
+       if(!this.inicial.name().equals(B.inicial.name())){
+           return false;
        }
-       
-       return equals;
+       return true;
     }
 
    /** getTransiciones(): Retorna el conjunto de tranciciones
