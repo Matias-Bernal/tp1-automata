@@ -8,10 +8,7 @@ import automata.DFA;
 import automata.FA;
 import static org.junit.Assert.*;
 import org.junit.Test;
-/**
- *
- * @author gaston
- */
+
 public class EqualsLenguageTest {
     
     @Test
